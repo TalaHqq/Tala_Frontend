@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { fetchJSON, ApiError } from '@/utils/api'
+import { fetchJSON, ApiError } from '../utils/api'
 
 interface SignUpData {
   name?: string
