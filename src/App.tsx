@@ -1,10 +1,18 @@
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { LoginPage } from '@/pages/LoginPage'
+import { SignUpPage } from '@/pages/SignUpPage'
+import { ForgotPasswordPage } from '@/pages/ForgotPasswordPage'
+
 function App() {
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-4">
-      <div className="space-y-4 text-center">
-        <h1 className="text-4xl font-bold tracking-tight">Tala App</h1>
-      </div>
-    </div>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      
+      {/* TODO: Add protected route logic in task 0.4. For now, redirect unauthenticated users to login */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
   )
 }
 
