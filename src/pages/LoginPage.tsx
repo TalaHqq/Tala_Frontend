@@ -13,12 +13,12 @@ export function LoginPage() {
       {/* Left Column (Form) */}
       <div className="flex w-full flex-col justify-center px-4 sm:px-6 lg:w-[45%] lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm space-y-8">
-          
+
           {/* Header */}
           <div className="space-y-6">
             <h1 className="text-[28px] font-bold tracking-tight text-foreground font-mono">TALA</h1>
             <h2 className="text-3xl font-semibold tracking-tight text-foreground">
-              Log in to your account
+              Log in
             </h2>
           </div>
 
