@@ -1,12 +1,66 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Eye, EyeOff } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useSignUp } from '@/hooks/useSignUp'
 
 export function SignUpPage() {
+  const navigate = useNavigate()
+  const { isLoading, error: apiError, submit } = useSignUp()
+  
   const [showPassword, setShowPassword] = useState(false)
+  const [formData, setFormData] = useState({ name: '', email: '', password: '' })
+  const [errors, setErrors] = useState({ name: '', email: '', password: '' })
+
+  const validateField = (field: keyof typeof formData, value: string) => {
+    if (!value.trim()) {
+      setErrors(prev => ({ ...prev, [field]: 'This field is required' }))
+      return false
+    }
+    if (field === 'email' && !/\S+@\S+\.\S+/.test(value)) {
+      setErrors(prev => ({ ...prev, email: 'Please enter a valid email' }))
+      return false
+    }
+    if (field === 'password' && value.length < 6) {
+      setErrors(prev => ({ ...prev, password: 'Password must be at least 6 characters' }))
+      return false
+    }
+    setErrors(prev => ({ ...prev, [field]: '' }))
+    return true
+  }
+
+  const handleBlur = (field: keyof typeof formData) => {
+    validateField(field, formData[field])
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target
+    setFormData(prev => ({ ...prev, [id]: value }))
+    // Clear error when user starts typing
+    if (errors[id as keyof typeof errors]) {
+      setErrors(prev => ({ ...prev, [id]: '' }))
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    // Validate all fields
+    const isNameValid = validateField('name', formData.name)
+    const isEmailValid = validateField('email', formData.email)
+    const isPasswordValid = validateField('password', formData.password)
+
+    if (!isNameValid || !isEmailValid || !isPasswordValid) {
+      return
+    }
+
+    const { success } = await submit(formData)
+    if (success) {
+      navigate('/library')
+    }
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -52,15 +106,43 @@ export function SignUpPage() {
             </div> */}
 
             {/* Sign Up Form */}
-            <div className="space-y-4">
-              {/* <div className="space-y-1.5">
-                <Label htmlFor="fullName" className="text-sm font-medium text-black">Full Name</Label>
-                <Input id="fullName" placeholder="Sena Agyei" type="text" className="h-9 border-input" />
-              </div> */}
+            {apiError && (
+              <div className="rounded-md bg-amber-50 p-4 border border-amber-200">
+                <div className="flex">
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-amber-800">{apiError}</h3>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="name" className="text-sm font-medium text-foreground">Full Name</Label>
+                <Input 
+                  id="name" 
+                  placeholder="Sena Agyei" 
+                  type="text" 
+                  className={`h-9 border-input bg-background text-foreground ${errors.name ? 'border-red-500' : ''}`}
+                  value={formData.name}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur('name')} 
+                />
+                {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
+              </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="email" className="text-sm font-medium text-foreground">Email</Label>
-                <Input id="email" placeholder="sagyei@tala.com" type="email" className="h-9 border-input bg-background text-foreground" />
+                <Input 
+                  id="email" 
+                  placeholder="sagyei@tala.com" 
+                  type="email" 
+                  className={`h-9 border-input bg-background text-foreground ${errors.email ? 'border-red-500' : ''}`}
+                  value={formData.email}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur('email')}
+                />
+                {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
               </div>
 
               <div className="space-y-1.5">
@@ -69,7 +151,10 @@ export function SignUpPage() {
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    className="pr-10 h-9 border-input bg-background text-foreground"
+                    className={`pr-10 h-9 border-input bg-background text-foreground ${errors.password ? 'border-red-500' : ''}`}
+                    value={formData.password}
+                    onChange={handleChange}
+                    onBlur={() => handleBlur('password')}
                   />
                   <button
                     type="button"
@@ -86,15 +171,25 @@ export function SignUpPage() {
                     </span>
                   </button>
                 </div>
+                {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
               </div>
 
               <Button
-                className="w-full h-9 mt-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.2),inset_0_0_0_0.5px_rgba(0,0,0,0.2),0_1px_2px_0_rgba(0,0,0,0.05)] cursor-pointer"
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-9 mt-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.2),inset_0_0_0_0.5px_rgba(0,0,0,0.2),0_1px_2px_0_rgba(0,0,0,0.05)] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
                 size="lg"
               >
-                Continue
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Please wait
+                  </>
+                ) : (
+                  'Continue'
+                )}
               </Button>
-            </div>
+            </form>
           </div>
 
           {/* Footer Text */}
