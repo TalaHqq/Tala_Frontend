@@ -89,7 +89,7 @@ export function SignUpPage() {
               </div>
 
               <Button
-                className="w-full h-9 mt-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.2),inset_0_0_0_0.5px_rgba(0,0,0,0.2),0_1px_2px_0_rgba(0,0,0,0.05)]"
+                className="w-full h-9 mt-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.2),inset_0_0_0_0.5px_rgba(0,0,0,0.2),0_1px_2px_0_rgba(0,0,0,0.05)] cursor-pointer"
                 size="lg"
               >
                 Continue
