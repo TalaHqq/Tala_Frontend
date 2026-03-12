@@ -20,7 +20,7 @@ export function useLogin() {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await fetchJSON<LoginResponse>('https://tala-api-oigg.onrender.com/api/auth/signin', {
+      const response = await fetchJSON<LoginResponse>('/api/auth/signin', {
         method: 'POST',
         body: JSON.stringify(data)
       })
@@ -36,7 +36,9 @@ export function useLogin() {
          const rawMessage = err.body?.message || err.message || ''
          const lowerMsg = rawMessage.toLowerCase()
          
-         if (err.status === 401 || err.status === 400 || lowerMsg.includes('invalid') || lowerMsg.includes('incorrect')) {
+         if (lowerMsg.includes('not confirmed') || lowerMsg.includes('not verified') || lowerMsg.includes('verify your email')) {
+           errorMessage = 'Please verify your email before logging in. Check your inbox for a confirmation link.'
+         } else if (err.status === 401 || lowerMsg.includes('invalid') || lowerMsg.includes('incorrect')) {
            errorMessage = 'Incorrect email or password. Please try again.'
          } else if (err.status === 404 || lowerMsg.includes('not found')) {
            errorMessage = 'We couldn\'t find an account with that email.'

@@ -21,9 +21,15 @@ export function useSignUp() {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await fetchJSON<SignUpResponse>('https://tala-api-oigg.onrender.com/api/auth/signup', {
+      // Map 'name' to 'full_name' as required by the API schema
+      const payload = {
+        full_name: data.name,
+        email: data.email,
+        password: data.password,
+      }
+      const response = await fetchJSON<SignUpResponse>('/api/auth/signup', {
         method: 'POST',
-        body: JSON.stringify(data)
+        body: JSON.stringify(payload)
       })
 
       if (response.token) {
