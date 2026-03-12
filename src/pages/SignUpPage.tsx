@@ -23,9 +23,15 @@ export function SignUpPage() {
       setErrors(prev => ({ ...prev, email: 'Please enter a valid email' }))
       return false
     }
-    if (field === 'password' && value.length < 6) {
-      setErrors(prev => ({ ...prev, password: 'Password must be at least 6 characters' }))
-      return false
+    if (field === 'password') {
+      if (value.length < 8) {
+        setErrors(prev => ({ ...prev, password: 'Password must be at least 8 characters' }))
+        return false
+      }
+      if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/.test(value)) {
+        setErrors(prev => ({ ...prev, password: 'Must include uppercase, lowercase, number, and symbol' }))
+        return false
+      }
     }
     setErrors(prev => ({ ...prev, [field]: '' }))
     return true
