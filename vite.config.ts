@@ -14,7 +14,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: " https://dev-tala-api.onrender.com",
+        target: "https://dev-tala-api.onrender.com",
         changeOrigin: true,
         secure: true,
       },
