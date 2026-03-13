@@ -20,7 +20,7 @@ export function useLogin() {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await fetchJSON<LoginResponse>('/api/auth/signin', {
+      const response = await fetchJSON<LoginResponse>('https://dev-tala-api.onrender.com/api/auth/signin', {
         method: 'POST',
         body: JSON.stringify(data)
       })

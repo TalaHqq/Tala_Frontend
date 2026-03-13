@@ -9,7 +9,7 @@ import { useSignUp } from '../hooks/useSignUp'
 export function SignUpPage() {
   const navigate = useNavigate()
   const { isLoading, error: apiError, submit } = useSignUp()
-  
+
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', password: '' })
   const [errors, setErrors] = useState({ name: '', email: '', password: '' })
@@ -52,7 +52,7 @@ export function SignUpPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     // Validate all fields
     const isNameValid = validateField('name', formData.name)
     const isEmailValid = validateField('email', formData.email)
@@ -97,24 +97,24 @@ export function SignUpPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="name" className="text-sm font-medium text-foreground">Full Name</Label>
-                <Input 
-                  id="name" 
-                  placeholder="Sena Agyei" 
-                  type="text" 
+                <Input
+                  id="name"
+                  placeholder="Sena Agyei"
+                  type="text"
                   className={`h-9 border-input bg-background text-foreground ${errors.name ? 'border-red-500' : ''}`}
                   value={formData.name}
                   onChange={handleChange}
-                  onBlur={() => handleBlur('name')} 
+                  onBlur={() => handleBlur('name')}
                 />
                 {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="email" className="text-sm font-medium text-foreground">Email</Label>
-                <Input 
-                  id="email" 
-                  placeholder="sagyei@tala.com" 
-                  type="email" 
+                <Input
+                  id="email"
+                  placeholder="sagyei@tala.com"
+                  type="email"
                   className={`h-9 border-input bg-background text-foreground ${errors.email ? 'border-red-500' : ''}`}
                   value={formData.email}
                   onChange={handleChange}
@@ -199,21 +199,6 @@ export function SignUpPage() {
         <div className="relative w-full h-full rounded-[2.5rem] bg-gradient-to-tr from-[#E08210]/90 via-[#FFF8E8]/80 to-[#370606]/90 overflow-hidden isolate shadow-2xl">
           {/* Subtle noise texture overlay */}
           <div className="absolute inset-0 opacity-20 mix-blend-overlay" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>
-
-          {/* "Ask Lovable" AI floating pill */}
-          {/* <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm px-4">
-            <div className="flex h-12 w-full items-center justify-between rounded-full bg-white/20 px-4 py-2 shadow-lg backdrop-blur-md border border-white/30">
-              <span className="text-sm font-medium text-white/90 drop-shadow-sm">
-                Ask Lovable to build...
-              </span>
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-black shadow-sm transition-transform hover:scale-105 cursor-pointer">
-                <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                </svg>
-              </div>
-            </div>
-          </div> */}
-
         </div>
       </div>
 

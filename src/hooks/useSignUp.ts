@@ -27,7 +27,7 @@ export function useSignUp() {
         email: data.email,
         password: data.password,
       }
-      const response = await fetchJSON<SignUpResponse>('/api/auth/signup', {
+      const response = await fetchJSON<SignUpResponse>('https://dev-tala-api.onrender.com/api/auth/signup', {
         method: 'POST',
         body: JSON.stringify(payload)
       })
