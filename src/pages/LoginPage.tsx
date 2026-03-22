@@ -127,12 +127,7 @@ export function LoginPage() {
               </div>
 
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-sm font-medium text-foreground">Password</Label>
-                  <Link to="/forgot-password" className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4">
-                    Forgot password?
-                  </Link>
-                </div>
+                <Label htmlFor="password" className="text-sm font-medium text-foreground">Password</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -156,6 +151,11 @@ export function LoginPage() {
                       {showPassword ? 'Hide password' : 'Show password'}
                     </span>
                   </button>
+                </div>
+                <div className="flex justify-end">
+                  <Link to="/forgot-password" className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4">
+                    Forgot password?
+                  </Link>
                 </div>
                 {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
               </div>

@@ -64,7 +64,7 @@ export function SignUpPage() {
 
     const { success } = await submit(formData)
     if (success) {
-      navigate('/library')
+      navigate('/loading')
     }
   }
 
