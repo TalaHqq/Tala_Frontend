@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Home, FolderOpen, Clock, Users, ChevronLeft } from 'lucide-react'
 
@@ -35,16 +34,16 @@ export function Sidebar({ isExpanded, onToggle }: SidebarProps) {
         `}
       >
         {/* Top area — spacer for navbar height */}
-        <div className="flex items-center justify-between h-14 px-2 shrink-0">
-          {isExpanded && (
-            <span className="pl-2 text-sm font-bold font-mono text-foreground tracking-tight select-none">
+        <div className="flex items-center h-14 px-3 shrink-0">
+          <Link to="/" className="flex items-center gap-2">
+            <span className="text-base font-bold font-mono text-foreground tracking-tight select-none">
               TALA
             </span>
-          )}
+          </Link>
           {isExpanded && (
             <button
               onClick={onToggle}
-              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
+              className="ml-auto flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
               title="Collapse sidebar"
             >
               <ChevronLeft className="w-4 h-4" />
