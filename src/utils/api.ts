@@ -17,6 +17,12 @@ export async function fetchJSON<T>(url: string, options: RequestInit = {}): Prom
     headers.set('Content-Type', 'application/json')
   }
 
+  // Add token if it exists
+  const token = localStorage.getItem('tala_token')
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`)
+  }
+
   const response = await fetch(url, { ...options, headers })
 
   if (!response.ok) {

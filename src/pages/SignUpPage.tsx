@@ -11,8 +11,8 @@ export function SignUpPage() {
   const { isLoading, error: apiError, submit } = useSignUp()
 
   const [showPassword, setShowPassword] = useState(false)
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' })
-  const [errors, setErrors] = useState({ name: '', email: '', password: '' })
+  const [formData, setFormData] = useState({ email: '', password: '', confirmPassword: '' })
+  const [errors, setErrors] = useState({ email: '', password: '', confirmPassword: '' })
 
   const validateField = (field: keyof typeof formData, value: string) => {
     if (!value.trim()) {
@@ -32,6 +32,10 @@ export function SignUpPage() {
         setErrors(prev => ({ ...prev, password: 'Must include uppercase, lowercase, number, and symbol' }))
         return false
       }
+    }
+    if (field === 'confirmPassword' && value !== formData.password) {
+      setErrors(prev => ({ ...prev, confirmPassword: 'Passwords do not match' }))
+      return false
     }
     setErrors(prev => ({ ...prev, [field]: '' }))
     return true
@@ -54,11 +58,11 @@ export function SignUpPage() {
     e.preventDefault()
 
     // Validate all fields
-    const isNameValid = validateField('name', formData.name)
     const isEmailValid = validateField('email', formData.email)
     const isPasswordValid = validateField('password', formData.password)
+    const isConfirmPasswordValid = validateField('confirmPassword', formData.confirmPassword)
 
-    if (!isNameValid || !isEmailValid || !isPasswordValid) {
+    if (!isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
       return
     }
 
@@ -76,7 +80,7 @@ export function SignUpPage() {
 
           {/* Header */}
           <div className="space-y-6">
-            <h1 className="text-[28px] font-bold tracking-tight text-foreground font-mono">TALA</h1>
+            <h1 className="text-[28px] font-bold tracking-tight text-foreground font-sans">TALA</h1>
             <h2 className="text-3xl font-semibold tracking-tight text-foreground">
               Create your account
             </h2>
@@ -95,20 +99,6 @@ export function SignUpPage() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="name" className="text-sm font-medium text-foreground">Full Name</Label>
-                <Input
-                  id="name"
-                  placeholder="Sena Agyei"
-                  type="text"
-                  className={`h-9 border-input bg-background text-foreground ${errors.name ? 'border-red-500' : ''}`}
-                  value={formData.name}
-                  onChange={handleChange}
-                  onBlur={() => handleBlur('name')}
-                />
-                {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
-              </div>
-
               <div className="space-y-1.5">
                 <Label htmlFor="email" className="text-sm font-medium text-foreground">Email</Label>
                 <Input
@@ -150,6 +140,21 @@ export function SignUpPage() {
                   </button>
                 </div>
                 {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">Confirm Password</Label>
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showPassword ? 'text' : 'password'}
+                    className={`pr-10 h-9 border-input bg-background text-foreground ${errors.confirmPassword ? 'border-red-500' : ''}`}
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    onBlur={() => handleBlur('confirmPassword')}
+                  />
+                </div>
+                {errors.confirmPassword && <p className="text-xs text-red-500">{errors.confirmPassword}</p>}
               </div>
 
               <Button

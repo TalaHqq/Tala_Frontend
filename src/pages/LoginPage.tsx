@@ -42,7 +42,7 @@ export function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     // Validate all fields
     const isEmailValid = validateField('email', formData.email)
     const isPasswordValid = validateField('password', formData.password)
@@ -65,7 +65,7 @@ export function LoginPage() {
 
           {/* Header */}
           <div className="space-y-6">
-            <h1 className="text-[28px] font-bold tracking-tight text-foreground font-mono">TALA</h1>
+            <h1 className="text-[28px] font-bold tracking-tight text-foreground font-sans">TALA</h1>
             <h2 className="text-3xl font-semibold tracking-tight text-foreground">
               Log in
             </h2>
@@ -114,10 +114,10 @@ export function LoginPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="email" className="text-sm font-medium text-foreground">Email</Label>
-                <Input 
-                  id="email" 
-                  placeholder="sagyei@tala.com" 
-                  type="email" 
+                <Input
+                  id="email"
+                  placeholder="sagyei@tala.com"
+                  type="email"
                   className={`h-9 border-input bg-background text-foreground ${errors.email ? 'border-red-500' : ''}`}
                   value={formData.email}
                   onChange={handleChange}
@@ -182,7 +182,7 @@ export function LoginPage() {
           <div className="space-y-4 text-center">
             <div className="text-sm">
               <span className="text-muted-foreground">Don't have an account? </span>
-              <Link to="/signup" className="font-medium text-foreground underline underline-offset-4 hover:text-foreground/80">
+              <Link to="/register" className="font-medium text-foreground underline underline-offset-4 hover:text-foreground/80">
                 Sign up
               </Link>
             </div>

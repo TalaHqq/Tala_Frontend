@@ -8,9 +8,16 @@ interface LoginData {
 
 interface LoginResponse {
   message?: string
-  token?: string
-  user?: any
+  data?: {
+    token?: {
+      accessToken?: string
+      refreshToken?: string
+    }
+    user?: any
+  }
 }
+
+const API_BASE_URL = 'https://tala-dev-api-26jt.onrender.com'
 
 export function useLogin() {
   const [isLoading, setIsLoading] = useState(false)
@@ -20,35 +27,37 @@ export function useLogin() {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await fetchJSON<LoginResponse>('https://dev-tala-api.onrender.com/api/auth/signin', {
+      const response = await fetchJSON<LoginResponse>(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         body: JSON.stringify(data)
       })
 
-      if (response.token) {
-        localStorage.setItem('tala_token', response.token)
+      if (response.data?.token?.accessToken) {
+        localStorage.setItem('tala_token', response.data.token.accessToken)
       }
       return { success: true, data: response }
     } catch (err: any) {
       let errorMessage = 'Something went wrong. Please try again.'
-      
+
       if (err instanceof ApiError) {
-         const rawMessage = err.body?.message || err.message || ''
-         const lowerMsg = rawMessage.toLowerCase()
-         
-         if (lowerMsg.includes('not confirmed') || lowerMsg.includes('not verified') || lowerMsg.includes('verify your email')) {
-           errorMessage = 'Please verify your email before logging in. Check your inbox for a confirmation link.'
-         } else if (err.status === 401 || lowerMsg.includes('invalid') || lowerMsg.includes('incorrect')) {
-           errorMessage = 'Incorrect email or password. Please try again.'
-         } else if (err.status === 404 || lowerMsg.includes('not found')) {
-           errorMessage = 'We couldn\'t find an account with that email.'
-         }
+        console.error('Login Error Full Body:', err.body)
+        
+        const rawMessage = err.body?.message || err.message || ''
+        const lowerMsg = typeof rawMessage === 'string' ? rawMessage.toLowerCase() : ''
+
+        if (lowerMsg && (lowerMsg.includes('not confirmed') || lowerMsg.includes('not verified') || lowerMsg.includes('verify your email'))) {
+          errorMessage = 'Please verify your email before logging in. Check your inbox for a confirmation link.'
+        } else if (err.status === 401 || (lowerMsg && (lowerMsg.includes('invalid') || lowerMsg.includes('incorrect')))) {
+          errorMessage = 'Incorrect email or password. Please try again.'
+        } else if (err.status === 404 || (lowerMsg && (lowerMsg.includes('not found')))) {
+          errorMessage = 'We couldn\'t find an account with that email.'
+        }
       } else if (err.message) {
-         if (err.message.includes('fetch')) {
-             errorMessage = 'Network error. Please check your connection and try again.'
-         }
+        if (err.message.includes('fetch')) {
+          errorMessage = 'Network error. Please check your connection and try again.'
+        }
       }
-      
+
       setError(errorMessage)
       return { success: false, error: errorMessage }
     } finally {
