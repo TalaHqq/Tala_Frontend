@@ -1,0 +1,6 @@
+47:  const [activeMenuId, setActiveMenuId] = useState<string | null>(null)
+100:      if (activeMenuId && !(event.target as Element).closest('.menu-container')) {
+113:  }, [activeMenuId, activeAssetMenuId])
+158:    setActiveMenuId(activeMenuId === id ? null : id);
+850:                            className={`p-1.5 rounded-lg transition-all ${activeMenuId && activeMenuId === collection.id
+857:                          {activeMenuId && activeMenuId === collection.id && (
