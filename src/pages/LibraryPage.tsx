@@ -4,6 +4,7 @@ import { Search, Bell, Plus, X, Folder, ChevronDown, CloudUpload, Trash2, LogOut
 import { Sidebar } from '../components/shared/Sidebar'
 import { useCollections } from '../hooks/useCollections'
 import { useCollectionDetails } from '../hooks/useCollectionDetails'
+import { useAssetUpload } from '../hooks/useAssetUpload'
 import googleDriveIcon from '../assets/ICONS/GOOGLE DRIVE/google-drive.png'
 import dropboxIcon from '../assets/ICONS/DROPBOX/dropbox.png'
 
@@ -31,6 +32,7 @@ export function LibraryPage() {
   const [activeTab, setActiveTab] = useState<Tab>('all')
   const [activeAssetTab, setActiveAssetTab] = useState<AssetTab>('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [assetSearchQuery, setAssetSearchQuery] = useState('')
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null)
   const [sidebarExpanded, setSidebarExpanded] = useState(false)
@@ -50,47 +52,38 @@ export function LibraryPage() {
   const mockTeamMembers = ['Randy Russell', 'Sena Duodu', 'Bervelyn Amoako', 'Kofi TALA']
 
   const { collections, isLoading: isLoadingCollections, error: errorCollections, createCollection, deleteCollection, toggleFavorite, renameCollection } = useCollections()
-  const { collection: selectedCollection, isLoading: isLoadingDetails, error: errorDetails, toggleAssetFavorite, deleteAsset } = useCollectionDetails(selectedCollectionId)
-
+  const { collection: selectedCollection, isLoading: isLoadingDetails, error: errorDetails, toggleAssetFavorite, deleteAsset, refetch: refetchDetails } = useCollectionDetails(selectedCollectionId)
+  const { uploadAsset, uploadState } = useAssetUpload()
   const processFiles = (files: File[]) => {
     const newFiles = files.map(file => ({
+      rawFile: file,
       id: Math.random().toString(36).substr(2, 9),
       name: file.name,
       size: (file.size / (1024 * 1024)).toFixed(1) + ' MB',
       type: file.type.includes('image') ? 'Image' : file.type.includes('video') ? 'Video' : file.type.includes('audio') ? 'Audio' : 'Document',
       progress: 0,
-      status: 'Processing',
+      status: 'Ready',
       tags: []
     }));
     setUploadFiles(prev => [...prev, ...newFiles]);
-
-    // Simulate progress
-    newFiles.forEach(file => {
-      let p = 0;
-      const interval = setInterval(() => {
-        p += Math.random() * 30;
-        if (p >= 100) {
-          p = 100;
-          clearInterval(interval);
-          setUploadFiles(prev => prev.map(f => f.id === file.id ? { ...f, progress: 100, status: 'Uploaded' } : f));
-        } else {
-          setUploadFiles(prev => prev.map(f => f.id === file.id ? { ...f, progress: p } : f));
-        }
-      }, 400);
-    });
   }
 
   const allAssets = selectedCollection?.assets || []
-  const assets = allAssets.filter(asset => {
-    if (activeAssetTab === 'all') return true;
-    if (activeAssetTab === 'favorites') return asset.isFavorite;
-    if (activeAssetTab === 'docs') return asset.type === 'Document';
-    if (activeAssetTab === 'images') return asset.type === 'Image';
-    if (activeAssetTab === 'audio') return asset.type === 'Audio';
-    if (activeAssetTab === 'video') return asset.type === 'Video';
-    return true;
+  const assets = allAssets.filter((asset: any) => {
+    const matchesTab = (() => {
+      if (activeAssetTab === 'all') return true;
+      if (activeAssetTab === 'favorites') return asset.isFavorite;
+      if (activeAssetTab === 'docs') return asset.type === 'Document';
+      if (activeAssetTab === 'images') return asset.type === 'Image';
+      if (activeAssetTab === 'audio') return asset.type === 'Audio';
+      if (activeAssetTab === 'video') return asset.type === 'Video';
+      return true;
+    })();
+    const matchesSearch = !assetSearchQuery || 
+      (asset.name || asset.asset_name || '').toLowerCase().includes(assetSearchQuery.toLowerCase());
+    return matchesTab && matchesSearch;
   })
-  const selectedAsset = assets.find(a => a.id === selectedAssetId)
+  const selectedAsset = assets.find((a: any) => a.id === selectedAssetId)
 
   const filteredCollections = collections.filter((c) => {
     const matchesTab = activeTab === 'all' || (activeTab === 'favorites' && c.isFavorite)
@@ -112,11 +105,12 @@ export function LibraryPage() {
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
+    // Use 'click' instead of 'mousedown' so menu item onClick fires first
+    document.addEventListener('click', handleClickOutside)
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('click', handleClickOutside)
     }
-  }, [activeMenuId])
+  }, [activeMenuId, activeAssetMenuId])
 
   const handleLogout = () => {
     localStorage.removeItem('tala_token')
@@ -125,29 +119,43 @@ export function LibraryPage() {
 
   const handleDeleteCollection = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
+    e.preventDefault();
+    setActiveMenuId(null);
     if (window.confirm('Are you sure you want to delete this collection?')) {
-      await deleteCollection(id);
-      setActiveMenuId(null);
+      const result = await deleteCollection(id);
+      if (!result.success) {
+        alert('Failed to delete collection: ' + (result.error || 'Unknown error'));
+      }
     }
   }
 
   const handleToggleFavoriteAction = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    await toggleFavorite(id);
+    e.preventDefault();
     setActiveMenuId(null);
+    const result = await toggleFavorite(id);
+    if (!result.success) {
+      alert('Failed to toggle favorite: ' + (result.error || 'This feature may not be available yet.'));
+    }
   }
 
   const handleRenameCollectionAction = async (e: React.MouseEvent, id: string, currentTitle: string) => {
     e.stopPropagation();
+    e.preventDefault();
+    setActiveMenuId(null);
     const newTitle = window.prompt('Enter new collection name:', currentTitle);
     if (newTitle && newTitle !== currentTitle) {
-      await renameCollection(id, newTitle);
+      const result = await renameCollection(id, newTitle);
+      if (!result.success) {
+        alert('Failed to rename collection: ' + (result.error || 'Unknown error'));
+      }
     }
-    setActiveMenuId(null);
   }
 
-  const handleMenuClick = (e: React.MouseEvent, id: string) => {
+  const handleMenuClick = (e: React.MouseEvent, id: string | undefined) => {
     e.stopPropagation();
+    if (!id) return;
+    setProfileOpen(false); // Close profile menu when opening collection menu
     setActiveMenuId(activeMenuId === id ? null : id);
   }
 
@@ -218,42 +226,52 @@ export function LibraryPage() {
             <div className="aspect-video w-full rounded-2xl bg-[#1a1a1a] shadow-2xl overflow-hidden mb-10 border border-white/5 flex items-center justify-center group relative">
               {selectedAsset.type === 'Audio' ? (
                 <div className="w-full h-full flex flex-col items-center justify-center p-12 relative">
-                  <div className="flex items-end gap-1 mb-8 h-24">
-                    {[...Array(24)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="w-1 bg-white/20 rounded-full hover:bg-white/50 transition-colors"
-                        style={{ height: `${20 + Math.random() * 80}%` }}
-                      />
-                    ))}
-                  </div>
-                  <button className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform shadow-lg">
-                    <Play className="w-6 h-6 fill-current" />
-                  </button>
-                  <div className="absolute bottom-10 left-10 right-10">
-                    <div className="flex justify-between text-[11px] font-bold text-white/40 mb-2">
-                      <span>1:23</span>
-                      <span>3:45</span>
-                    </div>
-                    <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
-                      <div className="h-full w-1/3 bg-white" />
-                    </div>
-                  </div>
+                  {(selectedAsset as any).asset_short_url || selectedAsset.url ? (
+                    <audio controls className="w-full max-w-md" src={(selectedAsset as any).asset_short_url || selectedAsset.url} />
+                  ) : (
+                    <>
+                      <div className="flex items-end gap-1 mb-8 h-24">
+                        {[...Array(24)].map((_, i) => (
+                          <div
+                            key={i}
+                            className="w-1 bg-white/20 rounded-full hover:bg-white/50 transition-colors"
+                            style={{ height: `${20 + Math.random() * 80}%` }}
+                          />
+                        ))}
+                      </div>
+                      <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
+                        <Music className="w-6 h-6 text-white/40" />
+                      </div>
+                      <p className="mt-4 text-[12px] font-bold text-white/40">Audio preview not available</p>
+                    </>
+                  )}
                 </div>
               ) : selectedAsset.type === 'Video' ? (
                 <div className="relative w-full h-full flex items-center justify-center bg-black">
-                  <div className="absolute inset-0 bg-cover bg-center brightness-50" style={{ backgroundImage: 'radial-gradient(circle, #333 0%, #000 100%)' }} />
-                  <button className="relative w-16 h-16 rounded-full bg-white/10 border border-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 transition-all shadow-2xl">
-                    <Play className="w-6 h-6 fill-current" />
-                  </button>
-                  <p className="absolute bottom-24 text-[12px] font-bold text-white/60">Click to play video</p>
+                  {(selectedAsset as any).asset_short_url || selectedAsset.url ? (
+                    <video controls className="w-full h-full object-contain" src={(selectedAsset as any).asset_short_url || selectedAsset.url} />
+                  ) : (
+                    <>
+                      <div className="absolute inset-0 bg-cover bg-center brightness-50" style={{ backgroundImage: 'radial-gradient(circle, #333 0%, #000 100%)' }} />
+                      <div className="relative w-16 h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
+                        <Video className="w-6 h-6 text-white/40" />
+                      </div>
+                      <p className="absolute bottom-24 text-[12px] font-bold text-white/60">Video preview not available</p>
+                    </>
+                  )}
                 </div>
               ) : selectedAsset.type === 'Image' ? (
                 <div className="w-full h-full flex items-center justify-center p-8">
-                  <div className="w-24 h-24 text-white/10">
-                    <ImageIcon className="w-full h-full" />
-                  </div>
-                  <p className="absolute text-[12px] font-bold text-white/40">High-resolution preview unavailable in dummy mode</p>
+                  {(selectedAsset as any).asset_short_url || selectedAsset.url ? (
+                    <img src={(selectedAsset as any).asset_short_url || selectedAsset.url} alt={selectedAsset.name} className="max-w-full max-h-full object-contain rounded-lg" />
+                  ) : (
+                    <>
+                      <div className="w-24 h-24 text-white/10">
+                        <ImageIcon className="w-full h-full" />
+                      </div>
+                      <p className="absolute text-[12px] font-bold text-white/40">Image preview not available</p>
+                    </>
+                  )}
                 </div>
               ) : (
                 <div className="w-full h-full flex bg-[#efefef]">
@@ -285,14 +303,32 @@ export function LibraryPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="p-2.5 rounded-xl border border-border/60 hover:text-foreground hover:bg-secondary transition-all shadow-sm">
-                    <Heart className="w-5 h-5" />
+                  <button
+                    onClick={() => toggleAssetFavorite(selectedAsset.id)}
+                    className={`p-2.5 rounded-xl border border-border/60 hover:text-foreground hover:bg-secondary transition-all shadow-sm ${selectedAsset.isFavorite ? 'text-red-500' : ''}`}
+                  >
+                    <Heart className={`w-5 h-5 ${selectedAsset.isFavorite ? 'fill-current' : ''}`} />
                   </button>
-                  <button className="p-2.5 rounded-xl border border-border/60 hover:text-foreground hover:bg-secondary transition-all shadow-sm">
+                  <button
+                    onClick={() => {
+                      const url = (selectedAsset as any).asset_short_url || selectedAsset.url;
+                      if (url) window.open(url, '_blank');
+                      else alert('Download URL not available yet.');
+                    }}
+                    className="p-2.5 rounded-xl border border-border/60 hover:text-foreground hover:bg-secondary transition-all shadow-sm"
+                  >
                     <Download className="w-5 h-5" />
                   </button>
-                  <button className="p-2.5 rounded-xl border border-border/60 hover:text-foreground hover:bg-secondary transition-all shadow-sm">
-                    <MoreVertical className="w-5 h-5" />
+                  <button
+                    onClick={() => {
+                      if (window.confirm('Delete this asset?')) {
+                        deleteAsset(selectedAsset.id);
+                        setSelectedAssetId(null);
+                      }
+                    }}
+                    className="p-2.5 rounded-xl border border-border/60 hover:text-destructive hover:bg-destructive/5 transition-all shadow-sm"
+                  >
+                    <Trash2 className="w-5 h-5" />
                   </button>
                 </div>
               </div>
@@ -342,11 +378,11 @@ export function LibraryPage() {
             <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
               <h3 className="text-[15px] font-bold mb-6">Asset Details</h3>
               <div className="space-y-4">
-                <DetailItem label="File Format" value={selectedAsset.type === 'Audio' ? 'MP3' : selectedAsset.type === 'Video' ? 'MP4' : selectedAsset.type === 'Image' ? 'PNG' : 'PDF'} />
-                <DetailItem label="File Size" value={selectedAsset.type === 'Audio' ? '8.7 MB' : selectedAsset.type === 'Video' ? '42.5 MB' : selectedAsset.type === 'Image' ? '4.2 MB' : '2.4 MB'} />
-                <DetailItem label={selectedAsset.type === 'Audio' ? 'Duration' : selectedAsset.type === 'Video' ? 'Duration' : selectedAsset.type === 'Image' ? 'Dimensions' : 'Pages'} value={selectedAsset.metadata || '-'} />
-                <DetailItem label="Created" value="March 02, 2026" />
-                <DetailItem label="Modified" value="March 02, 2026" />
+                <DetailItem label="File Type" value={(selectedAsset as any).asset_type || selectedAsset.type || '-'} />
+                <DetailItem label="Asset Name" value={(selectedAsset as any).asset_name || selectedAsset.name || '-'} />
+                <DetailItem label="Metadata" value={selectedAsset.metadata || '-'} />
+                <DetailItem label="Created" value={formatDate((selectedAsset as any).created_at || (selectedAsset as any).createdAt)} />
+                <DetailItem label="Modified" value={formatDate((selectedAsset as any).updated_at || (selectedAsset as any).updatedAt)} />
                 <div className="pt-4 border-t border-border/10 mt-6">
                   <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-widest mb-3">Created By</p>
                   <div className="flex items-center gap-3">
@@ -429,7 +465,13 @@ export function LibraryPage() {
 
             <div className="relative" ref={profileRef}>
               <button
-                onClick={() => setProfileOpen(!profileOpen)}
+                onClick={() => {
+                  setProfileOpen(!profileOpen);
+                  if (!profileOpen) {
+                    setActiveMenuId(null);
+                    setActiveAssetMenuId(null);
+                  }
+                }}
                 className="flex items-center gap-2 p-0.5 rounded-full border border-border/50 hover:border-foreground/20 transition-all overflow-hidden"
               >
                 <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center">
@@ -515,7 +557,9 @@ export function LibraryPage() {
                           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40 pointer-events-none" />
                           <input
                             type="text"
-                            placeholder="Search collections..."
+                            placeholder="Search assets..."
+                            value={assetSearchQuery}
+                            onChange={(e) => setAssetSearchQuery(e.target.value)}
                             className="h-10 w-[240px] lg:w-[320px] rounded-lg border border-border bg-background pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/10 transition-all border-foreground/10"
                           />
                         </div>
@@ -559,6 +603,13 @@ export function LibraryPage() {
                   </div>
 
                   {/* Assets List Table */}
+                  {assets.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20 gap-4 border-t border-border/40">
+                      <FileText className="w-12 h-12 text-muted-foreground/20" />
+                      <p className="text-[15px] font-semibold text-muted-foreground/50">No assets yet</p>
+                      <p className="text-[13px] text-muted-foreground/40">Click "Add Files" to upload assets to this collection.</p>
+                    </div>
+                  ) : (
                   <div className="overflow-hidden border-t border-border/40">
                     <table className="w-full text-left border-collapse">
                       <thead>
@@ -571,7 +622,7 @@ export function LibraryPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border/40">
-                        {assets.map((asset) => (
+                        {assets.map((asset: any) => (
                           <tr
                             key={asset.id}
                             onClick={() => setSelectedAssetId(asset.id)}
@@ -602,7 +653,7 @@ export function LibraryPage() {
                             </td>
                             <td className="px-6 py-4 hidden lg:table-cell">
                               <div className="flex flex-wrap gap-1.5">
-                                {(asset.tags || []).map((tag, i) => (
+                                {(asset.tags || []).map((tag: any, i: any) => (
                                   <span key={i} className="px-2 py-0.5 rounded bg-secondary/50 text-[10px] font-medium text-muted-foreground/70">{tag}</span>
                                 ))}
                               </div>
@@ -624,12 +675,12 @@ export function LibraryPage() {
                                       e.stopPropagation();
                                       setActiveAssetMenuId(activeAssetMenuId === asset.id ? null : asset.id);
                                     }}
-                                    className={`p-2 rounded-lg transition-all ${activeAssetMenuId === asset.id ? 'text-foreground bg-secondary' : 'text-muted-foreground/40 hover:text-foreground hover:bg-secondary'}`}
+                                    className={`p-2 rounded-lg transition-all ${activeAssetMenuId && activeAssetMenuId === asset.id ? 'text-foreground bg-secondary' : 'text-muted-foreground/40 hover:text-foreground hover:bg-secondary'}`}
                                   >
                                     <MoreVertical className="w-4 h-4" />
                                   </button>
 
-                                  {activeAssetMenuId === asset.id && (
+                                  {activeAssetMenuId && activeAssetMenuId === asset.id && (
                                     <div className="absolute right-0 mt-2 w-48 rounded-xl border border-border bg-card shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-200">
                                       <button
                                         onClick={(e) => { e.stopPropagation(); setSelectedAssetId(asset.id); setActiveAssetMenuId(null); }}
@@ -639,14 +690,28 @@ export function LibraryPage() {
                                         Preview
                                       </button>
                                       <button
-                                        onClick={(e) => { e.stopPropagation(); setActiveAssetMenuId(null); }}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          const newName = window.prompt('Enter new asset name:', asset.name || asset.asset_name);
+                                          if (newName && newName !== (asset.name || asset.asset_name)) {
+                                            // Future: call PATCH /api/assets/:id to rename
+                                            alert('Asset rename will be available once the backend endpoint is deployed.');
+                                          }
+                                          setActiveAssetMenuId(null);
+                                        }}
                                         className="flex items-center gap-2.5 w-full px-3 py-2 text-[13px] font-medium text-foreground hover:bg-secondary rounded-lg transition-colors"
                                       >
                                         <Pencil className="w-4 h-4 opacity-50" />
                                         Rename
                                       </button>
                                       <button
-                                        onClick={(e) => { e.stopPropagation(); setActiveAssetMenuId(null); }}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          const url = asset.asset_short_url || asset.url;
+                                          if (url) window.open(url, '_blank');
+                                          else alert('Download URL not available yet.');
+                                          setActiveAssetMenuId(null);
+                                        }}
                                         className="flex items-center gap-2.5 w-full px-3 py-2 text-[13px] font-medium text-foreground hover:bg-secondary rounded-lg transition-colors"
                                       >
                                         <Download className="w-4 h-4 opacity-50" />
@@ -676,6 +741,7 @@ export function LibraryPage() {
                       </tbody>
                     </table>
                   </div>
+                  )}
                 </>
               )}
             </div>
@@ -726,9 +792,12 @@ export function LibraryPage() {
                       className="h-10 w-[240px] rounded-lg border border-foreground/10 bg-background pl-10 pr-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-foreground/10 transition-all"
                     />
                   </div>
-                  <button className="inline-flex items-center gap-2 h-10 px-5 rounded-lg bg-foreground text-background text-[13px] font-bold hover:opacity-90 transition-opacity">
+                  <button
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="inline-flex items-center gap-2 h-10 px-5 rounded-lg bg-foreground text-background text-[13px] font-bold hover:opacity-90 transition-opacity"
+                  >
                     <Plus className="w-4.5 h-4.5" />
-                    Upload
+                    New Collection
                   </button>
                 </div>
               </div>
@@ -785,14 +854,13 @@ export function LibraryPage() {
                         <div className="relative menu-container">
                           <button
                             onClick={(e) => handleMenuClick(e, collection.id)}
-                            className={`p-1.5 rounded-lg transition-all ${activeMenuId === collection.id
+                            className={`p-1.5 rounded-lg transition-all ${activeMenuId && activeMenuId === collection.id
                               ? 'text-foreground bg-secondary'
                               : 'text-muted-foreground/40 hover:text-foreground hover:bg-secondary'}`}
                           >
                             <MoreVertical className="w-4 h-4" />
                           </button>
-
-                          {activeMenuId === collection.id && (
+                          {activeMenuId && activeMenuId === collection.id && (
                             <div className="absolute right-0 mt-2 w-56 rounded-xl border border-border bg-card shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-200">
                               <button
                                 onClick={(e) => { e.stopPropagation(); setSelectedCollectionId(collection.id); setActiveMenuId(null); }}
@@ -816,14 +884,29 @@ export function LibraryPage() {
                                 {collection.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
                               </button>
                               <button
-                                onClick={(e) => { e.stopPropagation(); setActiveMenuId(null); }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  e.preventDefault();
+                                  setActiveMenuId(null);
+                                  const shareUrl = `${window.location.origin}/library?collection=${collection.id}`;
+                                  navigator.clipboard.writeText(shareUrl).then(() => {
+                                    alert('Collection link copied to clipboard!');
+                                  }).catch(() => {
+                                    alert('Share URL: ' + shareUrl);
+                                  });
+                                }}
                                 className="flex items-center gap-2.5 w-full px-3 py-2 text-[13px] font-medium text-foreground hover:bg-secondary rounded-lg transition-colors"
                               >
                                 <Share2 className="w-4 h-4 opacity-50" />
                                 Share
                               </button>
                               <button
-                                onClick={(e) => { e.stopPropagation(); setActiveMenuId(null); }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  e.preventDefault();
+                                  setActiveMenuId(null);
+                                  alert('Download Zip is not yet available. Assets can be downloaded individually from within the collection.');
+                                }}
                                 className="flex items-center gap-2.5 w-full px-3 py-2 text-[13px] font-medium text-foreground hover:bg-secondary rounded-lg transition-colors"
                               >
                                 <Download className="w-4 h-4 opacity-50" />
@@ -983,7 +1066,7 @@ export function LibraryPage() {
                   <h2 className="text-[20px] font-bold text-[#1A1A1A]">Upload Asset</h2>
                 </div>
                 <button
-                  onClick={() => setIsUploadModalOpen(false)}
+                  onClick={() => { setIsUploadModalOpen(false); setUploadFiles([]); }}
                   className="p-2 rounded-lg text-[#A0A0A0] hover:text-[#404040] hover:bg-secondary/50 transition-colors"
                   aria-label="Close"
                 >
@@ -1063,7 +1146,13 @@ export function LibraryPage() {
                   <div className="space-y-4">
                     <h3 className="text-[13px] font-bold text-[#1A1A1A] uppercase tracking-wider opacity-60">Uploaded Files</h3>
                     <div className="space-y-3">
-                      {uploadFiles.map((file) => (
+                      {uploadFiles.map((file) => {
+                        const state = uploadState[file.id];
+                        const displayProgress = state?.progress ?? file.progress;
+                        const displayStatus = state?.status ?? file.status;
+                        const hasError = displayStatus === 'Error';
+
+                        return (
                         <div key={file.id} className="relative p-5 rounded-[12px] border border-[#F0F0F0] bg-white group hover:border-[#1A1A1A]/10 transition-all shadow-sm">
                           <div className="flex items-center gap-4">
                             <div className="w-11 h-11 rounded-[8px] bg-[#1A1A1A] flex items-center justify-center flex-shrink-0">
@@ -1076,7 +1165,7 @@ export function LibraryPage() {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between mb-0.5">
                                 <h4 className="text-[14px] font-bold text-[#1A1A1A] truncate">{file.name}</h4>
-                                <span className={`text-[11px] font-bold ${file.status === 'Uploaded' ? 'text-green-600' : 'text-amber-500'}`}>{file.status}</span>
+                                <span className={`text-[11px] font-bold ${hasError ? 'text-destructive' : displayStatus === 'Done' ? 'text-green-600' : 'text-amber-500'}`}>{displayStatus}</span>
                               </div>
                               <p className="text-[12px] text-muted-foreground/40 mb-3">{file.size} • {file.type}</p>
 
@@ -1084,8 +1173,8 @@ export function LibraryPage() {
                                 {/* Progress Bar */}
                                 <div className="relative h-1 w-full max-w-[240px] bg-secondary/50 rounded-full overflow-hidden">
                                   <div
-                                    className="absolute left-0 top-0 h-full bg-[#1A1A1A] transition-all duration-300"
-                                    style={{ width: `${file.progress}%` }}
+                                    className={`absolute left-0 top-0 h-full transition-all duration-300 ${hasError ? 'bg-destructive' : 'bg-[#1A1A1A]'}`}
+                                    style={{ width: `${displayProgress}%` }}
                                   />
                                 </div>
 
@@ -1108,16 +1197,15 @@ export function LibraryPage() {
                                 </div>
                               </div>
                             </div>
-
                             <button
                               onClick={() => setUploadFiles(prev => prev.filter(f => f.id !== file.id))}
-                              className="p-2 rounded-lg text-muted-foreground/30 hover:text-destructive hover:bg-destructive/5 transition-all"
+                              className="w-8 h-8 rounded-full bg-white border border-[#F0F0F0] flex items-center justify-center hover:bg-destructive/5 hover:border-destructive/30 hover:text-destructive transition-colors group-hover:opacity-100 opacity-0 ml-4 absolute right-5 top-1/2 -translate-y-1/2"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </div>
-                      ))}
+                      )})}
                     </div>
                   </div>
                 )}
@@ -1175,13 +1263,22 @@ export function LibraryPage() {
               {/* Footer */}
               <div className="p-8 px-10 border-t border-[#F0F0F0] flex gap-4">
                 <button
-                  onClick={() => setIsUploadModalOpen(false)}
+                  onClick={() => { setIsUploadModalOpen(false); setUploadFiles([]); }}
                   className="flex-1 h-[52px] rounded-[10px] border border-[#E5E5E5] bg-white text-[14px] font-bold text-[#404040] hover:bg-secondary/30 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
-                  disabled={uploadFiles.length === 0}
+                  disabled={uploadFiles.length === 0 || Object.values(uploadState).some(s => s.status === 'Initiating' || s.status === 'Uploading' || s.status === 'Completing')}
+                  onClick={async () => {
+                    if (!selectedCollectionId) return;
+                    const promises = uploadFiles.map(async (f) => {
+                      if (uploadState[f.id]?.status === 'Done') return; // Skip completed
+                      await uploadAsset(f.rawFile, selectedCollectionId, f.id);
+                    });
+                    await Promise.all(promises);
+                    refetchDetails();
+                  }}
                   className="flex-1 h-[52px] rounded-[10px] bg-[#1A1A1A] text-white text-[14px] font-bold hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
                 >
                   Upload Assets

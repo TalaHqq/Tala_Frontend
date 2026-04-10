@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { fetchJSON } from '../utils/api'
 import type { Collection } from './useCollections'
-import { mockCollections } from './useCollections'
 
 const API_BASE_URL = 'https://tala-dev-api-26jt.onrender.com'
 
@@ -21,28 +20,6 @@ export interface CollectionDetails extends Collection {
   assets: Asset[]
 }
 
-const mockAssets: Record<string, Asset[]> = {
-  '1': [
-    { id: 'a1', name: 'Logo_Final.png', type: 'Image', creator: 'Randy Russell', updatedAt: '2 hours ago', metadata: '2400 x 2400 px', tags: ['Brand', 'Logo'] },
-    { id: 'a2', name: 'Typography_Guide.pdf', type: 'Document', creator: 'Sena Duodu', updatedAt: '5 hours ago', metadata: '12 Pages', tags: ['Guidelines', 'Design'] },
-    { id: 'a3', name: 'Component_Library.sketch', type: 'Document', creator: 'Randy Russell', updatedAt: '1 day ago', metadata: '42.5 MB', tags: ['UI Kit', 'Sketch'] },
-    { id: 'a4', name: 'Brand_Palette.svg', type: 'Image', creator: 'Sena Duodu', updatedAt: '2 days ago', metadata: 'Vector', tags: ['Brand', 'Colors'] },
-  ],
-  '2': [
-    { id: 'v1', name: 'Campaign_Promo.mp4', type: 'Video', creator: 'Bervelyn Amoako', updatedAt: '1 day ago', metadata: '0:30', tags: ['Marketing', 'Video'] },
-    { id: 'i1', name: 'Social_Banner_A.jpg', type: 'Image', creator: 'Randy Russell', updatedAt: '2 days ago', metadata: '1200 x 630 px', tags: ['Social', 'Ad'] },
-    { id: 'd1', name: 'Product_Launch_PR.docx', type: 'Document', creator: 'Sena Duodu', updatedAt: '3 days ago', metadata: '4 Pages', tags: ['PR', 'Marketing'] },
-  ],
-  '3': [
-    { id: 'd2', name: 'API_Documentation.pdf', type: 'Document', creator: 'System', updatedAt: '3 days ago', metadata: '45 Pages', tags: ['Technical', 'API'] },
-    { id: 'i2', name: 'Arch_Diagram.png', type: 'Image', creator: 'Sena Duodu', updatedAt: '4 days ago', metadata: '1920 x 1080 px', tags: ['Architecture', 'Technical'] },
-  ],
-  '4': [
-    { id: 's1', name: 'Ambient_Nature.mp3', type: 'Audio', creator: 'Kofi TALA', updatedAt: '1 week ago', metadata: '3:45', tags: ['Soundscape', 'Audio'], isFavorite: true },
-    { id: 's2', name: 'Button_Click.wav', type: 'Audio', creator: 'System', updatedAt: '1 week ago', metadata: '0:01', tags: ['UI Sound', 'Audio'] },
-  ]
-}
-
 export function useCollectionDetails(collectionId: string | null) {
   const [collection, setCollection] = useState<CollectionDetails | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -52,25 +29,44 @@ export function useCollectionDetails(collectionId: string | null) {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await fetchJSON<any>(`${API_BASE_URL}/api/collections/${id}`)
-      const data = response?.data;
-      if (data) {
-        setCollection((data.assets && data.assets.length > 0) ? data : {
-          ...data,
-          assets: mockAssets[id] || []
-        })
+      // Fetch collection record
+      const colResponse = await fetchJSON<any>(`${API_BASE_URL}/api/collections/${id}`);
+      const colData = colResponse?.data;
+      
+      let assets: Asset[] = [];
+      try {
+        // Fetch paginated assets specifically for this collection
+        const assetsResponse = await fetchJSON<any>(`${API_BASE_URL}/api/assets/collection/${id}`);
+        const rawAssets = assetsResponse?.data?.data || assetsResponse?.data || [];
+        
+        // Use a Map to deduplicate by ID
+        const deduplicatedMap = new Map<string, any>();
+        
+        rawAssets.forEach((a: any, index: number) => {
+          const id = a.id || a._id || `asset-${index}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+          if (!deduplicatedMap.has(id)) {
+            deduplicatedMap.set(id, { ...a, id });
+          }
+        });
+
+        assets = Array.from(deduplicatedMap.values());
+      } catch(e) {
+        console.warn('Failed to fetch assets, might not exist yet from backend:', e);
+      }
+
+      if (colData) {
+        const collectionWithId = {
+          ...colData,
+          id: colData.id || colData._id || id
+        };
+        setCollection({ ...collectionWithId, assets });
+      } else {
+        setCollection(null);
       }
     } catch (err: any) {
       console.error('Error fetching collection details:', err)
-      const mockCollection = mockCollections.find(c => c.id === id)
-      if (mockCollection) {
-        setCollection({
-          ...mockCollection,
-          assets: mockAssets[id] || []
-        })
-      } else {
-        setError(err.message || 'Failed to fetch collection details')
-      }
+      setError(err.message || 'Failed to fetch collection details')
+      setCollection(null)
     } finally {
       setIsLoading(false)
     }
@@ -104,12 +100,7 @@ export function useCollectionDetails(collectionId: string | null) {
       return { success: true }
     } catch (err: any) {
       console.error('Error toggling asset favorite:', err)
-      // Fallback for mock
-      setCollection(prev => prev ? {
-        ...prev,
-        assets: prev.assets.map(a => a.id === assetId ? { ...a, isFavorite: !a.isFavorite } : a)
-      } : null)
-      return { success: true }
+      return { success: false, error: err.message }
     }
   }
 
@@ -124,13 +115,28 @@ export function useCollectionDetails(collectionId: string | null) {
       return { success: true }
     } catch (err: any) {
       console.error('Error deleting asset:', err)
-      setCollection(prev => prev ? {
-        ...prev,
-        assets: prev.assets.filter(a => a.id !== assetId)
-      } : null)
-      return { success: true }
+      return { success: false, error: err.message }
     }
   }
 
-  return { collection, isLoading, error, toggleAssetFavorite, deleteAsset, refetch: () => collectionId && fetchDetails(collectionId) }
+  const addAssets = async (newAssets: Asset[]) => {
+    if (!collection) return { success: false }
+    try {
+      for (const asset of newAssets) {
+        await fetchJSON(`${API_BASE_URL}/api/collections/${collectionId}/assets`, {
+          method: 'POST',
+          body: JSON.stringify(asset)
+        })
+      }
+      if (collectionId) {
+        await fetchDetails(collectionId);
+      }
+      return { success: true }
+    } catch (err: any) {
+      console.error('Error adding assets:', err)
+      return { success: false, error: err.message }
+    }
+  }
+
+  return { collection, isLoading, error, toggleAssetFavorite, deleteAsset, addAssets, refetch: () => collectionId && fetchDetails(collectionId) }
 }

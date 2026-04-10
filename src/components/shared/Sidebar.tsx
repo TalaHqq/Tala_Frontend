@@ -1,11 +1,12 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Home, FolderOpen, Clock, Users, ChevronLeft } from 'lucide-react'
+import { Home, FolderOpen, Clock, Users, ChevronLeft, User } from 'lucide-react'
 
 const navItems = [
   { icon: Home, label: 'Home', path: '/' },
   { icon: FolderOpen, label: 'Library', path: '/library' },
   { icon: Clock, label: 'Timeline', path: '/timeline' },
   { icon: Users, label: 'Team', path: '/team' },
+  { icon: User, label: 'Profile', path: '/profile' },
 ]
 
 interface SidebarProps {

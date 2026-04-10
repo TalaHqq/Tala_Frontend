@@ -13,40 +13,6 @@ export interface Collection {
   ownerId?: string
 }
 
-export const mockCollections: Collection[] = [
-  {
-    id: '1',
-    title: 'Design System',
-    description: 'Core brand assets, UI kits, and design guidelines for TALA projects.',
-    assetCount: 12,
-    updatedAt: '2 hours ago',
-    isFavorite: true
-  },
-  {
-    id: '2',
-    title: 'Marketing Assets',
-    description: 'Social media templates, campaign videos, and high-res promotional icons.',
-    assetCount: 24,
-    updatedAt: '1 day ago',
-    isFavorite: false
-  },
-  {
-    id: '3',
-    title: 'Technical Docs',
-    description: 'API documentation, architecture diagrams, and development specifications.',
-    assetCount: 8,
-    updatedAt: '3 days ago',
-    isFavorite: true
-  },
-  {
-    id: '4',
-    title: 'Audio Library',
-    description: 'Ambient soundscapes, UI sound effects, and background music tracks.',
-    assetCount: 15,
-    updatedAt: '1 week ago',
-    isFavorite: false
-  }
-]
 
 export function useCollections() {
   const [collections, setCollections] = useState<Collection[]>([])
@@ -57,13 +23,26 @@ export function useCollections() {
     setIsLoading(true)
     setError(null)
     try {
-      // Backend expects pagination and search params: perPage, page, q
-      const response = await fetchJSON<any>(`${API_BASE_URL}/api/collections?perPage=10&page=1&q=`)
-      const collectionsArray = response?.data || []
-      setCollections(collectionsArray.length > 0 ? collectionsArray : mockCollections)
+      const response = await fetchJSON<any>(`${API_BASE_URL}/api/collections`);
+      const rawData = response?.data || [];
+      
+      // Use a Map to deduplicate by ID
+      const deduplicatedMap = new Map<string, any>();
+      
+      rawData.forEach((c: any, index: number) => {
+        const id = c.id || c._id || `coll-${index}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        if (!deduplicatedMap.has(id)) {
+          deduplicatedMap.set(id, { ...c, id });
+        }
+      });
+
+      const collectionsArray = Array.from(deduplicatedMap.values());
+      setCollections(collectionsArray);
     } catch (err: any) {
-      console.error('Error fetching collections:', err)
-      setCollections(mockCollections)
+      console.error('Error fetching collections:', err);
+      // Fallback to empty array
+      setCollections([]);
+      setError(err.message || 'Failed to retrieve collections');
     } finally {
       setIsLoading(false)
     }
@@ -80,9 +59,21 @@ export function useCollections() {
         method: 'POST',
         body: JSON.stringify({ title })
       })
-      const newCollection = response?.data;
-      if (!newCollection) throw new Error('No data returned')
-      setCollections(prev => [newCollection, ...prev])
+      const rawCollection = response?.data;
+      if (!rawCollection) throw new Error('No data returned')
+      
+      const newId = rawCollection.id || rawCollection._id || `coll-new-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
+      const newCollection = {
+        ...rawCollection,
+        id: newId
+      };
+
+      setCollections(prev => {
+        // Prevent adding a duplicate if it already exists in the state
+        if (prev.some(c => c.id === newId)) return prev;
+        return [newCollection, ...prev];
+      });
       return { success: true, collection: newCollection }
     } catch (err: any) {
       console.error('Error creating collection:', err)
@@ -97,9 +88,7 @@ export function useCollections() {
       return { success: true }
     } catch (err: any) {
       console.error('Error deleting collection:', err)
-      // Fallback for mock data
-      setCollections(prev => prev.filter(c => c.id !== id))
-      return { success: true }
+      return { success: false, error: err.message };
     }
   }
 
@@ -120,8 +109,7 @@ export function useCollections() {
       return { success: true }
     } catch (err: any) {
       console.error('Error toggling favorite:', err)
-      setCollections(prev => prev.map(c => c.id === id ? { ...c, isFavorite: !c.isFavorite } : c))
-      return { success: true }
+      return { success: false, error: err.message };
     }
   }
 
@@ -138,8 +126,7 @@ export function useCollections() {
       return { success: true }
     } catch (err: any) {
       console.error('Error renaming collection:', err)
-      setCollections(prev => prev.map(c => c.id === id ? { ...c, title } : c))
-      return { success: true }
+      return { success: false, error: err.message };
     }
   }
 

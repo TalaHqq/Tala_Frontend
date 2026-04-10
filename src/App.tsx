@@ -5,6 +5,7 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 import { ResetPasswordPage } from './pages/ResetPasswordPage'
 import { LibraryPage } from './pages/LibraryPage'
 import { LoadingPage } from './pages/LoadingPage'
+import { ProfilePage } from './pages/ProfilePage'
 
 function App() {
   return (
@@ -14,6 +15,8 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/library" element={<LibraryPage />} />
+      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/profile/:username" element={<ProfilePage />} />
       <Route path="/loading" element={<LoadingPage />} />
 
       {/* TODO: Add protected route logic in task 0.4. For now, redirect unauthenticated users to login */}
