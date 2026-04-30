@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { fetchJSON } from '../utils/api';
+import { fetchJSON, API_BASE_URL } from '../utils/api';
 
-const API_BASE_URL = 'https://tala-dev-api-26jt.onrender.com';
 const PART_SIZE = 5 * 1024 * 1024; // 5 MB minimum
 
 export interface UploadProgress {

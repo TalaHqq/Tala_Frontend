@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
-import { fetchJSON } from '../utils/api'
+import { fetchJSON, API_BASE_URL } from '../utils/api'
 import type { Collection } from './useCollections'
 
-const API_BASE_URL = 'https://tala-dev-api-26jt.onrender.com'
 
 export interface Asset {
   id: string
@@ -20,49 +19,98 @@ export interface CollectionDetails extends Collection {
   assets: Asset[]
 }
 
-export function useCollectionDetails(collectionId: string | null) {
+const ASSET_FAVORITES_KEY = 'tala_favorite_assets';
+
+export function useCollectionDetails(collectionId: string | null, assetSearchQuery: string = '', page: number = 1, perPage: number = 50) {
   const [collection, setCollection] = useState<CollectionDetails | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const getFavs = (): string[] => {
+    try {
+      const stored = localStorage.getItem(ASSET_FAVORITES_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const saveFavs = (favs: string[]) => {
+    localStorage.setItem(ASSET_FAVORITES_KEY, JSON.stringify(favs));
+  };
 
   const fetchDetails = async (id: string) => {
     setIsLoading(true)
     setError(null)
     try {
-      // Fetch collection record
       const colResponse = await fetchJSON<any>(`${API_BASE_URL}/api/collections/${id}`);
-      const colData = colResponse?.data;
+      const colData = colResponse?.data || colResponse;
       
+      if (!colData) {
+        setCollection(null);
+        return;
+      }
+
       let assets: Asset[] = [];
       try {
-        // Fetch paginated assets specifically for this collection
-        const assetsResponse = await fetchJSON<any>(`${API_BASE_URL}/api/assets/collection/${id}`);
-        const rawAssets = assetsResponse?.data?.data || assetsResponse?.data || [];
-        
-        // Use a Map to deduplicate by ID
-        const deduplicatedMap = new Map<string, any>();
-        
-        rawAssets.forEach((a: any, index: number) => {
-          const id = a.id || a._id || `asset-${index}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-          if (!deduplicatedMap.has(id)) {
-            deduplicatedMap.set(id, { ...a, id });
-          }
+        const queryParams = new URLSearchParams({
+          page: page.toString(),
+          perPage: perPage.toString(),
+          q: assetSearchQuery
         });
+        
+        const assetsResponse = await fetchJSON<any>(`${API_BASE_URL}/api/assets/collection/${id}?${queryParams.toString()}`);
+        const rawAssets = assetsResponse?.data || assetsResponse;
+        const assetsArray = Array.isArray(rawAssets) ? rawAssets : (rawAssets?.data || []);
+        
+        const favs = getFavs();
 
-        assets = Array.from(deduplicatedMap.values());
+        assets = assetsArray.map((a: any) => {
+          let type: Asset['type'] = 'Document';
+          const mime = (a.assetType || a.type || '').toLowerCase();
+          if (mime.includes('audio')) type = 'Audio';
+          else if (mime.includes('video')) type = 'Video';
+          else if (mime.includes('image')) type = 'Image';
+
+          return {
+            id: a.id || a._id,
+            name: a.assetName || a.name || 'Untitled Asset',
+            creator: a.creator || 'System',
+            updatedAt: a.updatedAt || a.createdAt || a.updated_at,
+            type,
+            metadata: a.metadata || '',
+            tags: Array.isArray(a.tags) ? a.tags : [],
+            url: a.assetShortUrl || a.assetLongUrl || a.url,
+            isFavorite: favs.includes(a.id || a._id)
+          };
+        });
       } catch(e) {
-        console.warn('Failed to fetch assets, might not exist yet from backend:', e);
+        console.warn('Failed to fetch assets:', e);
       }
 
-      if (colData) {
-        const collectionWithId = {
-          ...colData,
-          id: colData.id || colData._id || id
+      setCollection(prev => {
+        const newCollectionData = {
+          id: colData.id || colData._id,
+          title: colData.title || 'Untitled Collection',
+          description: colData.description || '',
+          assetCount: colData.assetCount !== undefined ? colData.assetCount : (page === 1 ? assets.length : (prev?.assetCount || assets.length)),
+          updatedAt: colData.updatedAt || colData.createdAt || colData.updated_at,
+          ownerId: colData.userId || colData.ownerId,
         };
-        setCollection({ ...collectionWithId, assets });
-      } else {
-        setCollection(null);
-      }
+
+        if (page === 1 || !prev) {
+          return { ...newCollectionData, assets };
+        } else {
+          const combinedAssets = [...prev.assets, ...assets];
+          const seen = new Set();
+          const uniqueAssets = combinedAssets.filter(a => {
+            if (seen.has(a.id)) return false;
+            seen.add(a.id);
+            return true;
+          });
+          return { ...newCollectionData, assets: uniqueAssets };
+        }
+      });
     } catch (err: any) {
       console.error('Error fetching collection details:', err)
       setError(err.message || 'Failed to fetch collection details')
@@ -78,28 +126,38 @@ export function useCollectionDetails(collectionId: string | null) {
     } else {
       setCollection(null)
     }
-  }, [collectionId])
+  }, [collectionId, assetSearchQuery, page, perPage])
 
   const toggleAssetFavorite = async (assetId: string) => {
+    const favs = getFavs();
+    const newFavs = favs.includes(assetId) ? favs.filter(f => f !== assetId) : [...favs, assetId];
+    saveFavs(newFavs);
+
+    setCollection(prev => prev ? {
+      ...prev,
+      assets: prev.assets.map(a => a.id === assetId ? { ...a, isFavorite: !a.isFavorite } : a)
+    } : null);
+    return { success: true };
+  }
+
+  const updateAsset = async (assetId: string, data: Partial<Asset>) => {
     if (!collection) return { success: false }
     try {
-      const asset = collection.assets.find(a => a.id === assetId)
-      if (!asset) return { success: false }
-      
-      const response = await fetchJSON<any>(`${API_BASE_URL}/api/collections/${collectionId}/assets/${assetId}/favorite`, {
+      const updateDto: any = {};
+      if (data.name) updateDto.assetName = data.name;
+
+      await fetchJSON(`${API_BASE_URL}/api/assets/${assetId}`, {
         method: 'PATCH',
-        body: JSON.stringify({ isFavorite: !asset.isFavorite })
+        body: JSON.stringify(updateDto)
       })
-      const updated = response?.data;
-      if (updated) {
-        setCollection(prev => prev ? {
-          ...prev,
-          assets: prev.assets.map(a => a.id === assetId ? updated : a)
-        } : null)
-      }
+      
+      setCollection(prev => prev ? {
+        ...prev,
+        assets: prev.assets.map(a => a.id === assetId ? { ...a, ...data } : a)
+      } : null)
       return { success: true }
     } catch (err: any) {
-      console.error('Error toggling asset favorite:', err)
+      console.error('Error updating asset:', err)
       return { success: false, error: err.message }
     }
   }
@@ -107,7 +165,7 @@ export function useCollectionDetails(collectionId: string | null) {
   const deleteAsset = async (assetId: string) => {
     if (!collection) return { success: false }
     try {
-      await fetchJSON(`${API_BASE_URL}/api/collections/${collectionId}/assets/${assetId}`, { method: 'DELETE' })
+      await fetchJSON(`${API_BASE_URL}/api/assets/${assetId}`, { method: 'DELETE' })
       setCollection(prev => prev ? {
         ...prev,
         assets: prev.assets.filter(a => a.id !== assetId)
@@ -119,24 +177,10 @@ export function useCollectionDetails(collectionId: string | null) {
     }
   }
 
-  const addAssets = async (newAssets: Asset[]) => {
-    if (!collection) return { success: false }
-    try {
-      for (const asset of newAssets) {
-        await fetchJSON(`${API_BASE_URL}/api/collections/${collectionId}/assets`, {
-          method: 'POST',
-          body: JSON.stringify(asset)
-        })
-      }
-      if (collectionId) {
-        await fetchDetails(collectionId);
-      }
-      return { success: true }
-    } catch (err: any) {
-      console.error('Error adding assets:', err)
-      return { success: false, error: err.message }
-    }
+  const addAssets = async (_newAssets: Asset[]) => {
+    if (collectionId) await fetchDetails(collectionId);
+    return { success: true }
   }
 
-  return { collection, isLoading, error, toggleAssetFavorite, deleteAsset, addAssets, refetch: () => collectionId && fetchDetails(collectionId) }
+  return { collection, isLoading, error, toggleAssetFavorite, deleteAsset, addAssets, updateAsset, refetch: () => collectionId && fetchDetails(collectionId) }
 }
