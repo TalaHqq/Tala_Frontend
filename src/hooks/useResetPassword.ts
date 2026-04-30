@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { fetchJSON, ApiError } from '../utils/api'
+import { fetchJSON, ApiError, API_BASE_URL } from '../utils/api'
 
 interface ResetPasswordData {
   token: string
@@ -21,7 +21,7 @@ export function useResetPassword() {
     setError(null)
     setSuccess(false)
     try {
-      const response = await fetchJSON<ResetPasswordResponse>(`https://tala-dev-api-26jt.onrender.com/api/auth/reset-password?token=${data.token}`, {
+      const response = await fetchJSON<ResetPasswordResponse>(`${API_BASE_URL}/api/auth/reset-password?token=${data.token}`, {
         method: 'POST',
         body: JSON.stringify({
           newPassword: data.password,

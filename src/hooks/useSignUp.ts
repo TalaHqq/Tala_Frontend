@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { fetchJSON, ApiError } from '../utils/api'
+import { fetchJSON, ApiError, API_BASE_URL } from '../utils/api'
 
 interface SignUpData {
   email?: string
@@ -18,7 +18,6 @@ interface SignUpResponse {
   }
 }
 
-const API_BASE_URL = 'https://tala-dev-api-26jt.onrender.com'
 
 export function useSignUp() {
   const [isLoading, setIsLoading] = useState(false)

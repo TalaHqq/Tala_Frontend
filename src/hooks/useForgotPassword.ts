@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { fetchJSON, ApiError } from '../utils/api'
+import { fetchJSON, ApiError, API_BASE_URL } from '../utils/api'
 
 interface ForgotPasswordData {
   email: string
@@ -19,7 +19,7 @@ export function useForgotPassword() {
     setError(null)
     setSuccess(false)
     try {
-      const response = await fetchJSON<ForgotPasswordResponse>('https://tala-dev-api-26jt.onrender.com/api/auth/request-password-reset', {
+      const response = await fetchJSON<ForgotPasswordResponse>(`${API_BASE_URL}/api/auth/request-password-reset`, {
         method: 'POST',
         body: JSON.stringify(data)
       })

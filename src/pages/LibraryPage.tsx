@@ -5,6 +5,7 @@ import { Sidebar } from '../components/shared/Sidebar'
 import { useCollections } from '../hooks/useCollections'
 import { useCollectionDetails } from '../hooks/useCollectionDetails'
 import { useAssetUpload } from '../hooks/useAssetUpload'
+import { useAssetLogs } from '../hooks/useAssetLogs'
 import googleDriveIcon from '../assets/ICONS/GOOGLE DRIVE/google-drive.png'
 import dropboxIcon from '../assets/ICONS/DROPBOX/dropbox.png'
 
@@ -51,8 +52,38 @@ export function LibraryPage() {
 
   const mockTeamMembers = ['Randy Russell', 'Sena Duodu', 'Bervelyn Amoako', 'Kofi TALA']
 
-  const { collections, isLoading: isLoadingCollections, error: errorCollections, createCollection, deleteCollection, toggleFavorite, renameCollection } = useCollections()
-  const { collection: selectedCollection, isLoading: isLoadingDetails, error: errorDetails, toggleAssetFavorite, deleteAsset, refetch: refetchDetails } = useCollectionDetails(selectedCollectionId)
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('')
+  const [debouncedAssetSearchQuery, setDebouncedAssetSearchQuery] = useState('')
+  const [collectionsPage, setCollectionsPage] = useState(1)
+  const [assetsPage, setAssetsPage] = useState(1)
+
+  // Reset pages when searching
+  useEffect(() => {
+    setCollectionsPage(1)
+  }, [debouncedSearchQuery])
+
+  useEffect(() => {
+    setAssetsPage(1)
+  }, [debouncedAssetSearchQuery])
+
+  // Debouncing search queries
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedAssetSearchQuery(assetSearchQuery)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [assetSearchQuery])
+
+  const { collections, isLoading: isLoadingCollections, error: errorCollections, createCollection, deleteCollection, toggleFavorite, renameCollection } = useCollections(debouncedSearchQuery, collectionsPage)
+  const { collection: selectedCollection, isLoading: isLoadingDetails, error: errorDetails, toggleAssetFavorite, deleteAsset, updateAsset, refetch: refetchDetails } = useCollectionDetails(selectedCollectionId, debouncedAssetSearchQuery, assetsPage)
+  const { logs: assetLogs, isLoading: isLoadingLogs } = useAssetLogs(selectedAssetId)
   const { uploadAsset, uploadState } = useAssetUpload()
   const processFiles = (files: File[]) => {
     const newFiles = files.map(file => ({
@@ -70,26 +101,18 @@ export function LibraryPage() {
 
   const allAssets = selectedCollection?.assets || []
   const assets = allAssets.filter((asset: any) => {
-    const matchesTab = (() => {
-      if (activeAssetTab === 'all') return true;
-      if (activeAssetTab === 'favorites') return asset.isFavorite;
-      if (activeAssetTab === 'docs') return asset.type === 'Document';
-      if (activeAssetTab === 'images') return asset.type === 'Image';
-      if (activeAssetTab === 'audio') return asset.type === 'Audio';
-      if (activeAssetTab === 'video') return asset.type === 'Video';
-      return true;
-    })();
-    const matchesSearch = !assetSearchQuery || 
-      (asset.name || asset.asset_name || '').toLowerCase().includes(assetSearchQuery.toLowerCase());
-    return matchesTab && matchesSearch;
+    if (activeAssetTab === 'all') return true;
+    if (activeAssetTab === 'favorites') return asset.isFavorite;
+    if (activeAssetTab === 'docs') return asset.type === 'Document';
+    if (activeAssetTab === 'images') return asset.type === 'Image';
+    if (activeAssetTab === 'audio') return asset.type === 'Audio';
+    if (activeAssetTab === 'video') return asset.type === 'Video';
+    return true;
   })
   const selectedAsset = assets.find((a: any) => a.id === selectedAssetId)
 
   const filteredCollections = collections.filter((c) => {
-    const matchesTab = activeTab === 'all' || (activeTab === 'favorites' && c.isFavorite)
-    const matchesSearch = c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (c.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
-    return matchesTab && matchesSearch
+    return activeTab === 'all' || (activeTab === 'favorites' && c.isFavorite)
   })
 
   useEffect(() => {
@@ -402,11 +425,22 @@ export function LibraryPage() {
             <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
               <h3 className="text-[15px] font-bold mb-6">Recent Activity</h3>
               <div className="space-y-6">
-                <ActivityItem user="Randy Russell" action="downloaded this asset" time="2 hours ago" />
-                <ActivityItem user="Bervelyn Amoako" action="updated the description" time="1 day ago" />
-                <ActivityItem user="Kofi TALA" action="added tags" time="2 days ago" />
-                <ActivityItem user="Randy Russell" action="downloaded this asset" time="2 hours ago" />
-                <ActivityItem user="Bervelyn Amoako" action="updated the description" time="1 day ago" />
+                {isLoadingLogs ? (
+                  <div className="flex justify-center py-4">
+                    <Loader2 className="w-5 h-5 animate-spin text-muted-foreground/40" />
+                  </div>
+                ) : assetLogs.length > 0 ? (
+                  assetLogs.slice(0, 5).map((log) => (
+                    <ActivityItem 
+                      key={log.id} 
+                      user={log.user.fullName || log.user.id || 'System'} 
+                      action={log.description.replace(/^Asset ".*?" /, '')} 
+                      time={formatDate(log.createdAt)} 
+                    />
+                  ))
+                ) : (
+                  <p className="text-[12px] text-muted-foreground/40 italic">No recent activity</p>
+                )}
               </div>
             </div>
           </div>
@@ -499,7 +533,7 @@ export function LibraryPage() {
         </header>
 
         <main className="flex-1 overflow-auto">
-          {selectedAssetId && selectedAsset ? renderAssetDetails() : selectedCollectionId && selectedCollection ? (
+          {selectedAssetId && selectedAsset ? renderAssetDetails() : selectedCollectionId ? (
             <div className="max-w-[1400px] mx-auto px-6 lg:px-10 py-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
               {isLoadingDetails ? (
                 <div className="flex flex-col items-center justify-center py-20 gap-4">
@@ -511,7 +545,7 @@ export function LibraryPage() {
                   <AlertCircle className="w-10 h-10 text-destructive/40" />
                   <p className="text-sm font-medium text-destructive/60">{errorDetails}</p>
                 </div>
-              ) : (
+              ) : selectedCollection ? (
                 <>
                   {/* Breadcrumbs */}
                   <nav className="flex items-center gap-2 text-[11px] font-medium text-muted-foreground/60 mb-6">
@@ -690,12 +724,15 @@ export function LibraryPage() {
                                         Preview
                                       </button>
                                       <button
-                                        onClick={(e) => {
+                                        onClick={async (e) => {
                                           e.stopPropagation();
-                                          const newName = window.prompt('Enter new asset name:', asset.name || asset.asset_name);
-                                          if (newName && newName !== (asset.name || asset.asset_name)) {
-                                            // Future: call PATCH /api/assets/:id to rename
-                                            alert('Asset rename will be available once the backend endpoint is deployed.');
+                                          const currentName = asset.name || asset.asset_name;
+                                          const newName = window.prompt('Enter new asset name:', currentName);
+                                          if (newName && newName !== currentName) {
+                                            const result = await updateAsset(asset.id, { name: newName });
+                                            if (!result.success) {
+                                              alert('Failed to rename asset: ' + (result.error || 'Unknown error'));
+                                            }
                                           }
                                           setActiveAssetMenuId(null);
                                         }}
@@ -740,16 +777,26 @@ export function LibraryPage() {
                         ))}
                       </tbody>
                     </table>
+                    {assets.length >= 50 && (
+                      <div className="flex justify-center py-8">
+                        <button 
+                          onClick={() => setAssetsPage(p => p + 1)}
+                          className="h-10 px-8 rounded-lg border border-border bg-background text-foreground text-[13px] font-bold hover:bg-secondary/50 transition-colors"
+                        >
+                          Load More Assets
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  )}
-                </>
-              )}
-            </div>
-          ) : (
-            <div className="max-w-[1400px] mx-auto px-6 lg:px-10 py-10">
-              <h1 className="text-3xl font-bold text-foreground tracking-tight mb-10">
-                Collections
-              </h1>
+                )}
+              </>
+            ) : null}
+          </div>
+        ) : (
+          <div className="max-w-[1400px] mx-auto px-6 lg:px-10 py-10">
+            <h1 className="text-3xl font-bold text-foreground tracking-tight mb-10">
+              Collections
+            </h1>
 
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-10">
                 <div className="flex items-center gap-10 relative border-b border-border/10">
@@ -820,6 +867,7 @@ export function LibraryPage() {
                   </button>
                 </div>
               ) : (
+                <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                   <button
                     onClick={() => setIsCreateModalOpen(true)}
@@ -942,6 +990,17 @@ export function LibraryPage() {
                     </div>
                   ))}
                 </div>
+                {filteredCollections.length >= 20 && (
+                  <div className="flex justify-center mt-12 mb-8">
+                    <button 
+                      onClick={() => setCollectionsPage(p => p + 1)}
+                      className="h-10 px-8 rounded-lg border border-border bg-background text-foreground text-[13px] font-bold hover:bg-secondary/50 transition-colors"
+                    >
+                      Load More Collections
+                    </button>
+                  </div>
+                )}
+                </>
               )}
             </div>
           )}

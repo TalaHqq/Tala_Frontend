@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react'
-import { fetchJSON } from '../utils/api'
-
-const API_BASE_URL = 'https://tala-dev-api-26jt.onrender.com'
+import { fetchJSON, API_BASE_URL } from '../utils/api'
 
 export interface Collection {
   id: string
@@ -13,34 +11,84 @@ export interface Collection {
   ownerId?: string
 }
 
+const FAVORITES_KEY = 'tala_favorite_collections';
 
-export function useCollections() {
+export function useCollections(searchQuery: string = '', page: number = 1, perPage: number = 20) {
   const [collections, setCollections] = useState<Collection[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const getFavs = (): string[] => {
+    try {
+      const stored = localStorage.getItem(FAVORITES_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const saveFavs = (favs: string[]) => {
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
+  };
 
   const fetchCollections = async () => {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await fetchJSON<any>(`${API_BASE_URL}/api/collections`);
-      const rawData = response?.data || [];
+      const queryParams = new URLSearchParams();
+      queryParams.append('page', page.toString());
+      queryParams.append('perPage', perPage.toString());
+      if (searchQuery) {
+        queryParams.append('q', searchQuery);
+      }
       
-      // Use a Map to deduplicate by ID
-      const deduplicatedMap = new Map<string, any>();
+      const response = await fetchJSON<any>(`${API_BASE_URL}/api/collections?${queryParams.toString()}`);
+      console.log('GET /api/collections response:', response);
       
-      rawData.forEach((c: any, index: number) => {
-        const id = c.id || c._id || `coll-${index}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        if (!deduplicatedMap.has(id)) {
-          deduplicatedMap.set(id, { ...c, id });
-        }
+      // Handle different possible response structures
+      let collectionsArray: any[] = [];
+      if (Array.isArray(response)) {
+        collectionsArray = response;
+      } else if (response && Array.isArray(response.data)) {
+        collectionsArray = response.data;
+      } else if (response && Array.isArray(response.collections)) {
+        collectionsArray = response.collections;
+      } else if (response && response.data && Array.isArray(response.data.collections)) {
+        collectionsArray = response.data.collections;
+      } else if (response && response.data && Array.isArray(response.data.data)) {
+        collectionsArray = response.data.data;
+      }
+      
+      const favs = getFavs();
+
+      const newCollections: Collection[] = collectionsArray.map((c: any, index: number) => {
+        const id = c.id || c._id || `coll-${index}-${Date.now()}`;
+        return {
+          id,
+          title: c.title || 'Untitled Collection',
+          description: c.description || '',
+          assetCount: c.assetCount !== undefined ? c.assetCount : (c.assets ? c.assets.length : 0),
+          updatedAt: c.updatedAt || c.updated_at,
+          isFavorite: favs.includes(id),
+          ownerId: c.userId || c.ownerId
+        };
       });
 
-      const collectionsArray = Array.from(deduplicatedMap.values());
-      setCollections(collectionsArray);
+      if (page === 1) {
+        setCollections(newCollections);
+      } else {
+        setCollections(prev => {
+          const combined = [...prev, ...newCollections];
+          const seen = new Set();
+          return combined.filter(c => {
+            if (seen.has(c.id)) return false;
+            seen.add(c.id);
+            return true;
+          });
+        });
+      }
     } catch (err: any) {
       console.error('Error fetching collections:', err);
-      // Fallback to empty array
       setCollections([]);
       setError(err.message || 'Failed to retrieve collections');
     } finally {
@@ -50,30 +98,28 @@ export function useCollections() {
 
   useEffect(() => {
     fetchCollections()
-  }, [])
+  }, [searchQuery, page, perPage])
 
-  const createCollection = async (title: string, _description: string) => {
+  const createCollection = async (title: string, description: string) => {
     try {
-      // Backend CollectionsDto only accepts title
       const response = await fetchJSON<any>(`${API_BASE_URL}/api/collections/create`, {
         method: 'POST',
-        body: JSON.stringify({ title })
+        body: JSON.stringify({ title, description })
       })
-      const rawCollection = response?.data;
+      console.log('POST /api/collections/create response:', response);
+      const rawCollection = response?.data || response;
       if (!rawCollection) throw new Error('No data returned')
       
-      const newId = rawCollection.id || rawCollection._id || `coll-new-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      
-      const newCollection = {
-        ...rawCollection,
-        id: newId
+      const newCollection: Collection = {
+        id: rawCollection.id || rawCollection._id,
+        title: rawCollection.title,
+        description: description,
+        assetCount: 0,
+        updatedAt: new Date().toISOString(),
+        isFavorite: false
       };
 
-      setCollections(prev => {
-        // Prevent adding a duplicate if it already exists in the state
-        if (prev.some(c => c.id === newId)) return prev;
-        return [newCollection, ...prev];
-      });
+      setCollections(prev => [newCollection, ...prev]);
       return { success: true, collection: newCollection }
     } catch (err: any) {
       console.error('Error creating collection:', err)
@@ -93,24 +139,14 @@ export function useCollections() {
   }
 
   const toggleFavorite = async (id: string) => {
-    try {
-      const collection = collections.find(c => c.id === id)
-      if (!collection) return { success: false }
-      
-      // Note: Backend alignment might be needed here if favorite endpoint doesn't exist
-      const response = await fetchJSON<any>(`${API_BASE_URL}/api/collections/${id}/favorite`, {
-        method: 'PATCH',
-        body: JSON.stringify({ isFavorite: !collection.isFavorite })
-      })
-      const updated = response?.data;
-      if (updated) {
-        setCollections(prev => prev.map(c => c.id === id ? updated : c))
-      }
-      return { success: true }
-    } catch (err: any) {
-      console.error('Error toggling favorite:', err)
-      return { success: false, error: err.message };
-    }
+    const favs = getFavs();
+    const newFavs = favs.includes(id) ? favs.filter(f => f !== id) : [...favs, id];
+    saveFavs(newFavs);
+    
+    setCollections(prev => prev.map(c => 
+      c.id === id ? { ...c, isFavorite: !c.isFavorite } : c
+    ));
+    return { success: true };
   }
 
   const renameCollection = async (id: string, title: string) => {
@@ -119,10 +155,9 @@ export function useCollections() {
         method: 'PATCH',
         body: JSON.stringify({ title })
       })
-      const updated = response?.data;
-      if (updated) {
-        setCollections(prev => prev.map(c => c.id === id ? updated : c))
-      }
+      const updated = response?.data || response;
+      const newTitle = updated?.title || title;
+      setCollections(prev => prev.map(c => c.id === id ? { ...c, title: newTitle } : c))
       return { success: true }
     } catch (err: any) {
       console.error('Error renaming collection:', err)

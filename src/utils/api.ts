@@ -1,3 +1,5 @@
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://tala-dev-api-26jt.onrender.com';
+
 export class ApiError extends Error {
   status: number
   body: any
