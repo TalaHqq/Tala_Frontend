@@ -5,7 +5,7 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: '/Tala_Frontend/',  // Your repo name with slashes
+  base: '/',  // Root deployment - NOT /Tala_Frontend/
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
