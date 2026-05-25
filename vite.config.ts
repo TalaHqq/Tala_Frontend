@@ -6,12 +6,10 @@ import path from "path";
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
+  
   return {
     plugins: [react(), tailwindcss()],
-    base:'Tala_Frontend/',
-    // base: mode === 'production' ? '/YOUR-REPO-NAME/' : '/', // For GitHub Pages
-    // OR for custom domain/Render:
-    // base: '/',
+    base: '/Tala_Frontend/', // Make sure this matches your repo name exactly
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),

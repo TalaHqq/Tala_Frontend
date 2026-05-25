@@ -346,6 +346,7 @@ function TaskDetailModal({
   onClose: () => void
 }) {
   const [comment, setComment] = useState('')
+  // @ts-ignore
   const [status, setStatus] = useState(task.status)
   const overlayRef = useRef<HTMLDivElement>(null)
 
@@ -1289,6 +1290,7 @@ function CreateProjectModal({ onClose }: { onClose: () => void }) {
     { id: 'm2', name: 'Sarah Chen', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=60' },
     { id: 'm3', name: 'Mike Ross', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=60' },
   ])
+  // @ts-ignore
   const [assignedTo, setAssignedTo] = useState('John Doe')
   const [linkedCollections, setLinkedCollections] = useState<string[]>(['c1', 'c2', 'c3'])
   const [insightsDismissed, setInsightsDismissed] = useState(false)
@@ -1632,6 +1634,7 @@ export function TimelinePage({ sidebarExpanded, onToggleSidebar }: TimelinePageP
   const closeTaskDetail = () => setSelectedTask(null)
   const openCreateTask = () => setShowCreateTask(true)
   const closeCreateTask = () => setShowCreateTask(false)
+  // @ts-ignore
   const openCreateProject = () => setShowCreateProject(true)
   const closeCreateProject = () => setShowCreateProject(false)
 

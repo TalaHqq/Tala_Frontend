@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Search, Bell, LogOut, User,
-  ArrowUp, X, Download, CreditCard,
+  ArrowUp, X, Download,
 } from 'lucide-react'
 import { Sidebar } from '../components/shared/Sidebar'
 

@@ -50,7 +50,10 @@ function App() {
         path="/profile" 
         element={<ProfilePage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
-      <Route path="/profile/:username" element={<ProfilePage />} />
+      <Route 
+        path="/profile/:username" 
+        element={<ProfilePage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
+      />
       <Route path="/loading" element={<LoadingPage />} />
 
       <Route path="*" element={<Navigate to="/login" replace />} />
