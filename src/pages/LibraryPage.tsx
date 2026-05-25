@@ -11,6 +11,10 @@ import dropboxIcon from '../assets/ICONS/DROPBOX/dropbox.png'
 
 type Tab = 'all' | 'favorites'
 type AssetTab = 'all' | 'docs' | 'images' | 'video' | 'audio' | 'favorites'
+interface LibraryPageProps {
+  sidebarExpanded: boolean
+  onToggleSidebar: () => void
+}
 
 const formatDate = (dateStr?: string) => {
   if (!dateStr) return 'Recently';
@@ -28,7 +32,7 @@ const formatDate = (dateStr?: string) => {
   return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-export function LibraryPage() {
+export function LibraryPage({ sidebarExpanded, onToggleSidebar }: LibraryPageProps) {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<Tab>('all')
   const [activeAssetTab, setActiveAssetTab] = useState<AssetTab>('all')
@@ -36,7 +40,6 @@ export function LibraryPage() {
   const [assetSearchQuery, setAssetSearchQuery] = useState('')
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null)
-  const [sidebarExpanded, setSidebarExpanded] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [newCollectionData, setNewCollectionData] = useState({ title: '', description: '' })
@@ -357,7 +360,7 @@ export function LibraryPage() {
               </div>
 
               <div className="flex items-center gap-3">
-                <button className="inline-flex items-center gap-2 h-9 px-4 rounded-lg border border-border bg-background text-foreground text-[12px] font-bold hover:bg-secondary/50 transition-colors">
+                <button className="inline-flex items-center gap-2 h-9 px-4 rounded-lg border border-border bg-[#F4F4F4] text-foreground text-[12px] font-bold hover:bg-secondary/50 transition-colors">
                   <Plus className="w-3.5 h-3.5" />
                   Add Tag
                 </button>
@@ -471,17 +474,17 @@ export function LibraryPage() {
   )
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground font-sans">
+    <div className="flex min-h-screen bg-[#F4F4F4] text-foreground font-sans">
       <Sidebar
         isExpanded={sidebarExpanded}
-        onToggle={() => setSidebarExpanded(!sidebarExpanded)}
+    onToggle={onToggleSidebar} 
       />
 
       <div
         className="flex flex-1 flex-col min-w-0 transition-all duration-300 ease-in-out"
         style={{ marginLeft: sidebarExpanded ? '14rem' : '52px' }}
       >
-        <header className="flex items-center justify-between h-14 px-10 border-b border-border/10 bg-background/80 backdrop-blur-md sticky top-0 z-30">
+        <header className="flex items-center justify-between h-14 px-10 border-b border-border/10 bg-[#F4F4F4]/80 backdrop-blur-md sticky top-0 z-30">
           <div className="flex items-center gap-8">
             <span className="text-[18px] font-bold text-foreground/90 tracking-tight">
               Library
@@ -508,9 +511,9 @@ export function LibraryPage() {
                 }}
                 className="flex items-center gap-2 p-0.5 rounded-full border border-border/50 hover:border-foreground/20 transition-all overflow-hidden"
               >
-                <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center">
-                  <User className="w-4 h-4 text-foreground/40" />
-                </div>
+                   <div className="w-6 h-6 rounded-full bg-neutral-200 flex items-center justify-center">
+                                <User className="w-3.5 h-3.5 text-neutral-500" />
+                              </div>
               </button>
 
               {profileOpen && (
@@ -594,12 +597,12 @@ export function LibraryPage() {
                             placeholder="Search assets..."
                             value={assetSearchQuery}
                             onChange={(e) => setAssetSearchQuery(e.target.value)}
-                            className="h-10 w-[240px] lg:w-[320px] rounded-lg border border-border bg-background pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/10 transition-all border-foreground/10"
+                            className="h-10 w-[240px] lg:w-[320px] rounded-lg border border-border bg-[#F4F4F4] pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/10 transition-all border-foreground/10"
                           />
                         </div>
                         <button
                           onClick={() => setIsUploadModalOpen(true)}
-                          className="inline-flex items-center gap-2 h-10 px-5 rounded-lg border border-border bg-background text-foreground text-[13px] font-semibold hover:bg-secondary/50 transition-colors border-foreground/10"
+                          className="inline-flex items-center gap-2 h-10 px-5 rounded-lg border border-border bg-[#F4F4F4] text-foreground text-[13px] font-semibold hover:bg-secondary/50 transition-colors border-foreground/10"
                         >
                           <Plus className="w-4 h-4" />
                           Add Files
@@ -781,7 +784,7 @@ export function LibraryPage() {
                       <div className="flex justify-center py-8">
                         <button 
                           onClick={() => setAssetsPage(p => p + 1)}
-                          className="h-10 px-8 rounded-lg border border-border bg-background text-foreground text-[13px] font-bold hover:bg-secondary/50 transition-colors"
+                          className="h-10 px-8 rounded-lg border border-border bg-[#F4F4F4] text-foreground text-[13px] font-bold hover:bg-secondary/50 transition-colors"
                         >
                           Load More Assets
                         </button>
@@ -836,7 +839,7 @@ export function LibraryPage() {
                       placeholder="Search collections..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="h-10 w-[240px] rounded-lg border border-foreground/10 bg-background pl-10 pr-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-foreground/10 transition-all"
+                      className="h-10 w-[240px] rounded-lg border border-foreground/10 bg-[#F4F4F4] pl-10 pr-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-foreground/10 transition-all"
                     />
                   </div>
                   <button
@@ -871,7 +874,7 @@ export function LibraryPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                   <button
                     onClick={() => setIsCreateModalOpen(true)}
-                    className="group flex flex-col items-center justify-center gap-4 p-10 rounded-2xl border-2 border-dashed border-border/50 bg-background hover:border-foreground/20 hover:bg-secondary/10 transition-all duration-300 cursor-pointer min-h-[220px]"
+                    className="group flex flex-col items-center justify-center gap-4 p-10 rounded-2xl border-2 border-dashed border-border/50 bg-[#F4F4F4] hover:border-foreground/20 hover:bg-secondary/10 transition-all duration-300 cursor-pointer min-h-[220px]"
                   >
                     <div className="flex items-center justify-center w-14 h-14 rounded-full border-2 border-border/40 text-muted-foreground/50 group-hover:border-foreground/30 group-hover:text-foreground/70 transition-all duration-300">
                       <Plus className="w-6 h-6" />
@@ -994,7 +997,7 @@ export function LibraryPage() {
                   <div className="flex justify-center mt-12 mb-8">
                     <button 
                       onClick={() => setCollectionsPage(p => p + 1)}
-                      className="h-10 px-8 rounded-lg border border-border bg-background text-foreground text-[13px] font-bold hover:bg-secondary/50 transition-colors"
+                      className="h-10 px-8 rounded-lg border border-border bg-[#F4F4F4] text-foreground text-[13px] font-bold hover:bg-secondary/50 transition-colors"
                     >
                       Load More Collections
                     </button>

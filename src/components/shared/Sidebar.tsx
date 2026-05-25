@@ -1,12 +1,13 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Home, FolderOpen, Clock, Users, ChevronLeft, User } from 'lucide-react'
-
+import { Home, FolderOpen, Clock, Users, ChevronLeft, User, Settings, CreditCard } from 'lucide-react'
 const navItems = [
   { icon: Home, label: 'Home', path: '/' },
   { icon: FolderOpen, label: 'Library', path: '/library' },
   { icon: Clock, label: 'Timeline', path: '/timeline' },
   { icon: Users, label: 'Team', path: '/team' },
   { icon: User, label: 'Profile', path: '/profile' },
+  { icon: Settings, label: 'Settings', path: '/settings' },
+  { icon: CreditCard, label: 'Billing', path: '/billing' },
 ]
 
 interface SidebarProps {
@@ -29,13 +30,13 @@ export function Sidebar({ isExpanded, onToggle }: SidebarProps) {
 
       <aside
         className={`
-          fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-background
+          fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-[#F4F4F4] 
           transition-all duration-300 ease-in-out
-          ${isExpanded ? 'w-56' : 'w-[52px]'}
+          ${isExpanded ? 'w-56 pl-10' : 'w-[52px]'}
         `}
       >
         {/* Top area — spacer for navbar height */}
-        <div className="flex items-center h-14 px-3 shrink-0">
+        <div className="flex items-center h-14 justify-center shrink-0">
           <Link to="/" className="flex items-center gap-2">
             <span className="text-base font-bold font-mono text-foreground tracking-tight select-none">
               TALA

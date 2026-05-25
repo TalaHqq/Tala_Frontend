@@ -138,7 +138,8 @@ export function useCollections(searchQuery: string = '', page: number = 1, perPa
     }
   }
 
-  const toggleFavorite = async (id: string) => {
+const toggleFavorite = async (id: string) => {
+  try {
     const favs = getFavs();
     const newFavs = favs.includes(id) ? favs.filter(f => f !== id) : [...favs, id];
     saveFavs(newFavs);
@@ -147,8 +148,13 @@ export function useCollections(searchQuery: string = '', page: number = 1, perPa
       c.id === id ? { ...c, isFavorite: !c.isFavorite } : c
     ));
     return { success: true };
+  } catch (err) {
+    return { 
+      success: false, 
+      error: err instanceof Error ? err.message : 'Failed to toggle favorite' 
+    };
   }
-
+}
   const renameCollection = async (id: string, title: string) => {
     try {
       const response = await fetchJSON<any>(`${API_BASE_URL}/api/collections/${id}`, {

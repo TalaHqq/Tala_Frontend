@@ -58,7 +58,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-[#F4F4F4]">
       {/* Left Column (Form) */}
       <div className="flex w-full flex-col justify-center px-4 sm:px-6 lg:w-[45%] lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm space-y-8">
@@ -118,7 +118,7 @@ export function LoginPage() {
                   id="email"
                   placeholder="sagyei@tala.com"
                   type="email"
-                  className={`h-9 border-input bg-background text-foreground ${errors.email ? 'border-red-500' : ''}`}
+                  className={`h-9 border-input bg-[#F4F4F4] text-foreground ${errors.email ? 'border-red-500' : ''}`}
                   value={formData.email}
                   onChange={handleChange}
                   onBlur={() => handleBlur('email')}
@@ -132,7 +132,7 @@ export function LoginPage() {
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    className={`pr-10 h-9 border-input bg-background text-foreground ${errors.password ? 'border-red-500' : ''}`}
+                    className={`pr-10 h-9 border-input bg-[#F4F4F4] text-foreground ${errors.password ? 'border-red-500' : ''}`}
                     value={formData.password}
                     onChange={handleChange}
                     onBlur={() => handleBlur('password')}
