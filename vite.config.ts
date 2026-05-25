@@ -3,22 +3,12 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: '/Tala_Frontend/', // <-- YOUR REPO NAME (case-sensitive!)
+  base: '/Tala_Frontend/',  // MUST match your repo name
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-    },
-  },
-  server: {
-    proxy: {
-      "/api": {
-        target: "https://tala-dev-api-26jt.onrender.com",
-        changeOrigin: true,
-        secure: true,
-      },
     },
   },
 });
