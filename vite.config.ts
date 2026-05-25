@@ -8,6 +8,10 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   return {
     plugins: [react(), tailwindcss()],
+    base:'Tala_Frontend/',
+    // base: mode === 'production' ? '/YOUR-REPO-NAME/' : '/', // For GitHub Pages
+    // OR for custom domain/Render:
+    // base: '/',
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
