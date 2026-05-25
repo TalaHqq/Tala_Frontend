@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Search, Bell, LogOut, User,
-  Key, Shield, Clock, Sun, Moon,
-  Bell as BellIcon, Eye, Activity, BarChart2, Save,
+  Key, Shield, Clock, 
+  Bell as BellIcon, Save,
 } from 'lucide-react'
 import { Sidebar } from '../components/shared/Sidebar'
 
