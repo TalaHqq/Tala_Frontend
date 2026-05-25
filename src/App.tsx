@@ -22,41 +22,41 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<SignUpPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="Tala_Frontend/login" element={<LoginPage />} />
+      <Route path="Tala_Frontend/register" element={<SignUpPage />} />
+      <Route path="Tala_Frontend/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="Tala_Frontend/reset-password" element={<ResetPasswordPage />} />
       <Route 
-        path="/library" 
+        path="Tala_Frontend/library" 
         element={<LibraryPage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 
-        path="/timeline" 
+        path="Tala_Frontend/timeline" 
         element={<TimelinePage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 
-        path="/team" 
+        path="Tala_Frontend/team" 
         element={<TeamsPage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 
-        path="/settings" 
+        path="Tala_Frontend/settings" 
         element={<SettingsPage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 
-        path="/billing" 
+        path="Tala_Frontend/billing" 
         element={<BillingPage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 
-        path="/profile" 
+        path="Tala_Frontend/profile" 
         element={<ProfilePage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 
-        path="/profile/:username" 
+        path="Tala_Frontend/profile/:username" 
         element={<ProfilePage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
-      <Route path="/loading" element={<LoadingPage />} />
+      <Route path="Tala_Frontend/loading" element={<LoadingPage />} />
 
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="Tala_Frontend/*" element={<Navigate to="Tala_Frontend/login" replace />} />
     </Routes>
   )
 }
