@@ -1,10 +1,12 @@
-# .github/workflows/deploy.yml
 name: Deploy Vite React App to GitHub Pages
 
 on:
   push:
-    branches: ["main", "main2"]  # Add both branches or change to your default branch
+    branches: ["main", "main2"]
   workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # Add this line
 
 permissions:
   contents: read
@@ -25,7 +27,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'  # Use Node 22 instead of 20
           cache: 'npm'
       
       - name: Install dependencies
@@ -40,7 +42,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'  # Vite builds to 'dist' folder
+          path: './dist'
 
   deploy:
     environment:
