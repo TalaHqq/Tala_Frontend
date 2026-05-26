@@ -2,10 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/Tala_Frontend/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TALA</title>
-    <script type="module" crossorigin src="/Tala_Frontend/assets/index-CZh1LE3I.js"></script>
+        <script>
+      // Restore the original URL from the redirect parameter
+      (function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var redirectPath = urlParams.get('redirect');
+        
+        if (redirectPath) {
+          // Clean up the URL by removing the redirect parameter
+          var newUrl = decodeURIComponent(redirectPath);
+          window.history.replaceState(null, '', newUrl);
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/Tala_Frontend/assets/index-CmE-v70m.js"></script>
     <link rel="stylesheet" crossorigin href="/Tala_Frontend/assets/index-V516d6QH.css">
   </head>
   <body>
