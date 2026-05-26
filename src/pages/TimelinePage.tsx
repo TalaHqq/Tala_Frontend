@@ -1624,7 +1624,7 @@ export function TimelinePage({ sidebarExpanded, onToggleSidebar }: TimelinePageP
 
   const handleLogout = () => {
     localStorage.removeItem('tala_token')
-    navigate('/login')
+    navigate('/Tala_Frontend/login')
   }
 
   const toggleProject = (projectId: string) =>

@@ -8,7 +8,7 @@ export function LoadingPage() {
   useEffect(() => {
     // Redirect to library after 3 seconds
     const timer = setTimeout(() => {
-      navigate('/library')
+      navigate('/Tala_Frontend/library')
     }, 3000)
 
     return () => clearTimeout(timer)

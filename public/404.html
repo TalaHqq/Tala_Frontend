@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Tala - Redirecting...</title>
+    <script>
+      // Single Page Apps for GitHub Pages
+      // Preserves the original path so React Router can handle it
+      (function() {
+        var path = window.location.pathname;
+        var search = window.location.search;
+        var hash = window.location.hash;
+        
+        // Preserve the full original URL
+        var originalUrl = path + search + hash;
+        
+        // Redirect to index.html with the path as a query parameter
+        window.location.replace(
+          '/Tala_Frontend/?redirect=' + encodeURIComponent(originalUrl)
+        );
+      })();
+    </script>
+  </head>
+  <body>
+    Redirecting to Tala...
+  </body>
+</html>

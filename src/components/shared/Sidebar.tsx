@@ -37,7 +37,7 @@ export function Sidebar({ isExpanded, onToggle }: SidebarProps) {
       >
         {/* Top area — spacer for navbar height */}
         <div className="flex items-center h-14 justify-center shrink-0">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/Tala_Frontend/" className="flex items-center gap-2">
             <span className="text-base font-bold font-mono text-foreground tracking-tight select-none">
               TALA
             </span>

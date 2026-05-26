@@ -112,7 +112,7 @@ export function ResetPasswordPage() {
                     </div>
                     <div className="mt-4">
                       <Link 
-                        to="/forgot-password" 
+                        to="/Tala_Frontend/forgot-password" 
                         className="inline-flex h-8 items-center justify-center rounded-md border border-input bg-white px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
                       >
                         Request new link
@@ -135,7 +135,7 @@ export function ResetPasswordPage() {
                   </div>
                 </div>
                 <Link 
-                  to="/login" 
+                  to="/Tala_Frontend/login" 
                   className="flex h-9 w-full items-center justify-center rounded-lg bg-primary text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   Log in to your account
@@ -216,7 +216,7 @@ export function ResetPasswordPage() {
           <div className="space-y-4 text-center">
             <div className="text-sm">
               <span className="text-muted-foreground">Remember your password? </span>
-              <Link to="/login" className="font-medium text-foreground underline underline-offset-4 hover:text-foreground/80">
+              <Link to="/Tala_Frontend/login" className="font-medium text-foreground underline underline-offset-4 hover:text-foreground/80">
                 Log in
               </Link>
             </div>

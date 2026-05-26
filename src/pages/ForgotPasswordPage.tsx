@@ -160,7 +160,7 @@ export function ForgotPasswordPage() {
           <div className="space-y-4 text-center">
             <div className="text-sm">
               <span className="text-muted-foreground">Remember your password? </span>
-              <Link to="/login" className="font-medium text-foreground underline underline-offset-4 hover:text-foreground/80">
+              <Link to="/Tala_Frontend/login" className="font-medium text-foreground underline underline-offset-4 hover:text-foreground/80">
                 Log in
               </Link>
             </div>
