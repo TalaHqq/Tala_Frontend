@@ -1,13 +1,13 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Home, FolderOpen, Clock, Users, ChevronLeft, User, Settings, CreditCard } from 'lucide-react'
 const navItems = [
-  { icon: Home, label: 'Home', path: '/' },
-  { icon: FolderOpen, label: 'Library', path: '/library' },
-  { icon: Clock, label: 'Timeline', path: '/timeline' },
-  { icon: Users, label: 'Team', path: '/team' },
-  { icon: User, label: 'Profile', path: '/profile' },
-  { icon: Settings, label: 'Settings', path: '/settings' },
-  { icon: CreditCard, label: 'Billing', path: '/billing' },
+  { icon: Home, label: 'Home', path: '/Tala_Frontend/' },
+  { icon: FolderOpen, label: 'Library', path: '/Tala_Frontend/library' },
+  { icon: Clock, label: 'Timeline', path: '/Tala_Frontend/timeline' },
+  { icon: Users, label: 'Team', path: '/Tala_Frontend/team' },
+  { icon: User, label: 'Profile', path: '/Tala_Frontend/profile' },
+  { icon: Settings, label: 'Settings', path: '/Tala_Frontend/settings' },
+  { icon: CreditCard, label: 'Billing', path: '/Tala_Frontend/billing' },
 ]
 
 interface SidebarProps {

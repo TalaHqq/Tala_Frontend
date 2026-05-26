@@ -1,6 +1,6 @@
 // App.tsx
 import { useState } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { LoginPage } from './pages/LoginPage'
 import { SignUpPage } from './pages/SignUpPage'
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
@@ -56,7 +56,7 @@ function App() {
       />
       <Route path="Tala_Frontend/loading" element={<LoadingPage />} />
 
-      <Route path="Tala_Frontend/*" element={<Navigate to="Tala_Frontend/login" replace />} />
+      <Route path="*" element={<LoginPage />}/> 
     </Routes>
   )
 }
