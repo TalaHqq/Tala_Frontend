@@ -22,39 +22,39 @@ function App() {
 
   return (
     <Routes>
-      <Route path="Tala_Frontend/login" element={<LoginPage />} />
-      <Route path="Tala_Frontend/register" element={<SignUpPage />} />
-      <Route path="Tala_Frontend/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="Tala_Frontend/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/Tala_Frontend/login" element={<LoginPage />} />
+      <Route path="/Tala_Frontend/register" element={<SignUpPage />} />
+      <Route path="/Tala_Frontend/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/Tala_Frontend/reset-password" element={<ResetPasswordPage />} />
       <Route 
-        path="Tala_Frontend/library" 
+        path="/Tala_Frontend/library" 
         element={<LibraryPage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 
-        path="Tala_Frontend/timeline" 
+        path="/Tala_Frontend/timeline" 
         element={<TimelinePage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 
-        path="Tala_Frontend/team" 
+        path="/Tala_Frontend/team" 
         element={<TeamsPage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 
-        path="Tala_Frontend/settings" 
+        path="/Tala_Frontend/settings" 
         element={<SettingsPage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 
-        path="Tala_Frontend/billing" 
+        path="/Tala_Frontend/billing" 
         element={<BillingPage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 
-        path="Tala_Frontend/profile" 
+        path="/Tala_Frontend/profile" 
         element={<ProfilePage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 
-        path="Tala_Frontend/profile/:username" 
+        path="/Tala_Frontend/profile/:username" 
         element={<ProfilePage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
-      <Route path="Tala_Frontend/loading" element={<LoadingPage />} />
+      <Route path="/Tala_Frontend/loading" element={<LoadingPage />} />
 
       <Route path="*" element={<LoginPage />}/> 
     </Routes>
