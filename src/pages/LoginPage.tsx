@@ -53,7 +53,7 @@ export function LoginPage() {
 
     const { success } = await submit(formData)
     if (success) {
-      navigate('/Tala_Frontend/library')
+      navigate('/library')
     }
   }
 
@@ -153,7 +153,7 @@ export function LoginPage() {
                   </button>
                 </div>
                 <div className="flex justify-end">
-                  <Link to="/Tala_Frontend/forgot-password" className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4">
+                  <Link to="/forgot-password" className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4">
                     Forgot password?
                   </Link>
                 </div>
@@ -182,7 +182,7 @@ export function LoginPage() {
           <div className="space-y-4 text-center">
             <div className="text-sm">
               <span className="text-muted-foreground">Don't have an account? </span>
-              <Link to="/Tala_Frontend/register" className="font-medium text-foreground underline underline-offset-4 hover:text-foreground/80">
+              <Link to="/register" className="font-medium text-foreground underline underline-offset-4 hover:text-foreground/80">
                 Sign up
               </Link>
             </div>

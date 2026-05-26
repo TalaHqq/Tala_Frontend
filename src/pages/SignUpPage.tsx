@@ -190,7 +190,7 @@ export function SignUpPage() {
             </p>
             <div className="text-sm">
               <span className="text-muted-foreground">Already have an account? </span>
-              <Link to="/Tala_Frontend/login" className="font-medium text-foreground underline underline-offset-4 hover:text-foreground/80">
+              <Link to="/login" className="font-medium text-foreground underline underline-offset-4 hover:text-foreground/80">
                 Log in
               </Link>
             </div>
