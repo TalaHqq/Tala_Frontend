@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Home, FolderOpen, Clock, Users,Workflow, ChevronLeft, User, Settings, CreditCard } from 'lucide-react'
+import { Home, FolderOpen, Clock, Workflow, ChevronLeft, User, Settings, CreditCard } from 'lucide-react'
 const navItems = [
   { icon: Home, label: 'Home', path: '/' },
   { icon: FolderOpen, label: 'Library', path: '/library' },
