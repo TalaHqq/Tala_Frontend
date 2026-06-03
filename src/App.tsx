@@ -35,7 +35,7 @@ function App() {
         element={<TimelinePage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 
-        path="/team" 
+        path="/workspace" 
         element={<TeamsPage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 

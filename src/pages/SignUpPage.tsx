@@ -11,12 +11,16 @@ export function SignUpPage() {
   const { isLoading, error: apiError, submit } = useSignUp()
 
   const [showPassword, setShowPassword] = useState(false)
-  const [formData, setFormData] = useState({ email: '', password: '', confirmPassword: '' })
-  const [errors, setErrors] = useState({ email: '', password: '', confirmPassword: '' })
+  const [formData, setFormData] = useState({ fullName: '', email: '', password: '', confirmPassword: '' })
+  const [errors, setErrors] = useState({ fullName: '', email: '', password: '', confirmPassword: '' })
 
   const validateField = (field: keyof typeof formData, value: string) => {
     if (!value.trim()) {
       setErrors(prev => ({ ...prev, [field]: 'This field is required' }))
+      return false
+    }
+    if (field === 'fullName' && value.trim().length < 2) {
+      setErrors(prev => ({ ...prev, fullName: 'Full name must be at least 2 characters' }))
       return false
     }
     if (field === 'email' && !/\S+@\S+\.\S+/.test(value)) {
@@ -58,11 +62,12 @@ export function SignUpPage() {
     e.preventDefault()
 
     // Validate all fields
+    const isFullNameValid = validateField('fullName', formData.fullName)
     const isEmailValid = validateField('email', formData.email)
     const isPasswordValid = validateField('password', formData.password)
     const isConfirmPasswordValid = validateField('confirmPassword', formData.confirmPassword)
 
-    if (!isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
+    if (!isFullNameValid || !isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
       return
     }
 
@@ -99,6 +104,20 @@ export function SignUpPage() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="fullName" className="text-sm font-medium text-foreground">Full Name</Label>
+                <Input
+                  id="fullName"
+                  placeholder="Samuel Agyei"
+                  type="text"
+                  className={`h-9 border-input bg-background text-foreground ${errors.fullName ? 'border-red-500' : ''}`}
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur('fullName')}
+                />
+                {errors.fullName && <p className="text-xs text-red-500">{errors.fullName}</p>}
+              </div>
+
               <div className="space-y-1.5">
                 <Label htmlFor="email" className="text-sm font-medium text-foreground">Email</Label>
                 <Input

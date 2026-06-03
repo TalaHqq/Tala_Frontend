@@ -3,6 +3,7 @@ import { fetchJSON, ApiError, API_BASE_URL } from '../utils/api'
 
 interface SignUpData {
   email?: string
+  fullName?: string
   password?: string
   confirmPassword?: string
 }
@@ -29,6 +30,7 @@ export function useSignUp() {
     try {
       const payload = {
         email: data.email,
+        fullName: data.fullName,
         password: data.password,
         confirmPassword: data.confirmPassword,
       }

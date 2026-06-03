@@ -1,10 +1,10 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Home, FolderOpen, Clock, Users, ChevronLeft, User, Settings, CreditCard } from 'lucide-react'
+import { Home, FolderOpen, Clock, Users,Workflow, ChevronLeft, User, Settings, CreditCard } from 'lucide-react'
 const navItems = [
   { icon: Home, label: 'Home', path: '/' },
   { icon: FolderOpen, label: 'Library', path: '/library' },
   { icon: Clock, label: 'Timeline', path: '/timeline' },
-  { icon: Users, label: 'Team', path: '/team' },
+  { icon: Workflow, label: 'Workspace', path: '/workspace' },
   { icon: User, label: 'Profile', path: '/profile' },
   { icon: Settings, label: 'Settings', path: '/settings' },
   { icon: CreditCard, label: 'Billing', path: '/billing' },

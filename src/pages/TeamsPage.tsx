@@ -713,7 +713,7 @@ export function TeamsPage({ sidebarExpanded, onToggleSidebar }: TeamsPageProps) 
       >
         {/* ── Header ── */}
         <header className="flex items-center justify-between h-14 px-8 border-b border-neutral-200/60 bg-[#F4F4F4]/80 backdrop-blur-md sticky top-0 z-30">
-          <span className="text-[16px] font-semibold text-neutral-800 tracking-tight">Teams</span>
+          <span className="text-[16px] font-semibold text-neutral-800 tracking-tight">Workspace</span>
 
           <div className="flex items-center gap-5">
             <button className="p-1 text-neutral-500 hover:text-neutral-800 transition-colors">
