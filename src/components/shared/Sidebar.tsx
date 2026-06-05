@@ -169,10 +169,9 @@ return (
   }
 
   // Find the item that owns the current popover
-  const popoverItem = popover
-    ? [...navItems, ...bottomNavItems].find(i => i.path === popover.path)
-    : null
-
+ const popoverItem = popover
+  ? [...navItems, ...bottomNavItems].find(i => i.path === popover.path) as NavItem | undefined
+  : null
   return (
     <>
       {isExpanded && (
@@ -217,43 +216,42 @@ return (
       </aside>
 
       {/* Floating popover for collapsed sidebar */}
-      {!isExpanded && popover && popoverItem && 'children' in popoverItem && (
-        <div
-          ref={popoverRef}
-          className="fixed z-[60] bg-white border border-neutral-200 rounded-xl shadow-xl py-1.5 w-44"
-          style={{ top: popover.top, left: '60px' }}
-        >
-          {/* Popover header */}
-          <div className="px-3 py-1.5 mb-1 border-b border-neutral-100">
-            <span className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
-              {popoverItem.label}
-            </span>
-          </div>
+  {!isExpanded && popover && popoverItem && popoverItem.children && popoverItem.children.length > 0 && (
+  <div
+    ref={popoverRef}
+    className="fixed z-[60] bg-white border border-neutral-200 rounded-xl shadow-xl py-1.5 w-44"
+    style={{ top: popover.top, left: '60px' }}
+  >
+    <div className="px-3 py-1.5 mb-1 border-b border-neutral-100">
+      <span className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
+        {popoverItem.label}
+      </span>
+    </div>
 
-          {popoverItem.children!.map(child => {
-            const ChildIcon = child.icon
-            const childActive = location.pathname === child.path
-            return (
-              <Link
-                key={child.path}
-                to={child.path}
-                onClick={() => setPopover(null)}
-                className={`
-                  flex items-center gap-2.5 mx-1.5 px-2.5 py-2 rounded-lg text-[13px] font-medium
-                  transition-colors duration-150
-                  ${childActive
-                    ? 'bg-foreground text-background'
-                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-                  }
-                `}
-              >
-                <ChildIcon className="w-[15px] h-[15px] shrink-0" />
-                <span>{child.label}</span>
-              </Link>
-            )
-          })}
-        </div>
-      )}
+    {popoverItem.children.map(child => {
+      const ChildIcon = child.icon
+      const childActive = location.pathname === child.path
+      return (
+        <Link
+          key={child.path}
+          to={child.path}
+          onClick={() => setPopover(null)}
+          className={`
+            flex items-center gap-2.5 mx-1.5 px-2.5 py-2 rounded-lg text-[13px] font-medium
+            transition-colors duration-150
+            ${childActive
+              ? 'bg-foreground text-background'
+              : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+            }
+          `}
+        >
+          <ChildIcon className="w-[15px] h-[15px] shrink-0" />
+          <span>{child.label}</span>
+        </Link>
+      )
+    })}
+  </div>
+)}
     </>
   )
 }
