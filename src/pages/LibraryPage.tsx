@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Bell, Plus, X, Folder, ChevronDown, CloudUpload, Trash2, LogOut, User, ChevronRight, Download, MoreVertical, Heart, Music, Video, Image as ImageIcon, FileText, Play, Loader2, AlertCircle, Pencil, Share2 } from 'lucide-react'
+import { Search, Bell, Plus, X, Folder, ChevronDown, CreditCard, Settings,CloudUpload, Trash2, LogOut, User, ChevronRight, Download, MoreVertical, Heart, Music, Video, Image as ImageIcon, FileText, Play, Loader2, AlertCircle, Pencil, Share2 } from 'lucide-react'
 import { Sidebar } from '../components/shared/Sidebar'
 import { useCollections } from '../hooks/useCollections'
 import { useCollectionDetails } from '../hooks/useCollectionDetails'
@@ -516,21 +516,45 @@ export function LibraryPage({ sidebarExpanded, onToggleSidebar }: LibraryPagePro
                               </div>
               </button>
 
-              {profileOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-xl border border-border bg-card shadow-xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-200">
-                  <div className="px-3 py-2 border-b border-border/50 mb-1">
-                    <p className="text-[13px] font-bold">User</p>
-                    <p className="text-[11px] text-muted-foreground">Premium Account</p>
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-2.5 w-full px-3 py-2.5 text-[13px] font-medium text-destructive hover:bg-destructive/5 rounded-lg transition-colors"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Log out
-                  </button>
-                </div>
-              )}
+          {profileOpen && (
+  <div className="absolute right-0 mt-2 w-48 rounded-xl border border-neutral-200 bg-white shadow-xl p-1.5 z-50">
+    <div className="px-3 py-2 border-b border-neutral-100 mb-1">
+      <p className="text-[12px] font-bold">User</p>
+      <p className="text-[10px] text-neutral-400">Premium Account</p>
+    </div>
+    
+    <button
+      onClick={() => { navigate('/profile'); setProfileOpen(false) }}
+      className="flex items-center gap-2.5 w-full px-3 py-2.5 text-[12px] font-medium text-neutral-700 hover:bg-neutral-50 rounded-lg transition-colors"
+    >
+      <User className="w-3.5 h-3.5" />
+      Profile
+    </button>
+    <button
+      onClick={() => { navigate('/billing'); setProfileOpen(false) }}
+      className="flex items-center gap-2.5 w-full px-3 py-2.5 text-[12px] font-medium text-neutral-700 hover:bg-neutral-50 rounded-lg transition-colors"
+    >
+      <CreditCard className="w-3.5 h-3.5" />
+      Billing
+    </button>
+    <button
+      onClick={() => { navigate('/settings'); setProfileOpen(false) }}
+      className="flex items-center gap-2.5 w-full px-3 py-2.5 text-[12px] font-medium text-neutral-700 hover:bg-neutral-50 rounded-lg transition-colors"
+    >
+      <Settings className="w-3.5 h-3.5" />
+      Settings
+    </button>
+    <div className="h-px bg-neutral-100 my-1" />
+    <button
+      onClick={handleLogout}
+      className="flex items-center gap-2.5 w-full px-3 py-2.5 text-[12px] font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+    >
+      <LogOut className="w-3.5 h-3.5" />
+      Log out
+    </button>
+  </div>
+)}
+   
             </div>
           </div>
         </header>

@@ -9,7 +9,7 @@ import { LibraryPage } from './pages/LibraryPage'
 import { LoadingPage } from './pages/LoadingPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { TimelinePage } from './pages/TimelinePage'
-import { TeamsPage } from './pages/TeamsPage'
+import { WorkspacePage } from './pages/WorkspacePage'
 import { SettingsPage } from './pages/SettingsPage'
 import { BillingPage } from './pages/BillingPage'
 
@@ -35,8 +35,8 @@ function App() {
         element={<TimelinePage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 
-        path="/workspace" 
-        element={<TeamsPage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
+        path="/workspace/teams" 
+        element={<WorkspacePage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 
         path="/settings" 

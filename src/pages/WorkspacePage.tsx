@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import {
   Search, Bell, LogOut, User, Filter, ChevronDown,
   List, LayoutGrid, Paperclip, MessageSquare, Plus,
-  ChevronLeft, MoreVertical, Pencil, Send,
+  ChevronLeft, MoreVertical, Pencil, Send,CreditCard, Settings
 } from 'lucide-react'
 import { Sidebar } from '../components/shared/Sidebar'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface TeamsPageProps {
+interface WorkspacePageProps {
   sidebarExpanded: boolean
   onToggleSidebar: () => void
 }
@@ -17,7 +17,7 @@ interface TeamsPageProps {
 type ProjectStatus = 'Queued' | 'In Progress' | 'Completed'
 type DisplayMode = 'list' | 'grid'
 
-interface TeamProject {
+interface WorkspaceProject {
   id: string
   name: string
   status: ProjectStatus
@@ -68,7 +68,7 @@ const AVATAR_URLS = [
   'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=60',
 ]
 
-const TEAM_PROJECTS: TeamProject[] = [
+const WORKSPACE_PROJECTS: WorkspaceProject[] = [
   {
     id: 'tp1',
     name: 'FinTech Mobile Dashboard',
@@ -217,7 +217,9 @@ function AssetFileIcon({ type }: { type: DetailAsset['type'] }) {
 
 // ─── Project Card ─────────────────────────────────────────────────────────────
 
-function ProjectCard({ project, onClick }: { project: TeamProject; onClick: () => void }) {
+function ProjectCard({ project, onClick }: { project: WorkspaceProject; onClick: () => void }) {
+  
+
   return (
     <div
       onClick={onClick}
@@ -246,7 +248,8 @@ function ProjectCard({ project, onClick }: { project: TeamProject; onClick: () =
         <div className="flex-1 h-[5px] bg-neutral-100 rounded-full overflow-hidden">
           <div className="h-full bg-neutral-900 rounded-full transition-all" style={{ width: `${project.progress}%` }} />
         </div>
-        <MessageSquare className="w-4 h-4 text-neutral-300 flex-shrink-0" />
+        
+        <MessageSquare style={{fill:"black",color:"black"}} className="w-4 h-4 text-neutral-300 flex-shrink-0" />
       </div>
     </div>
   )
@@ -254,7 +257,7 @@ function ProjectCard({ project, onClick }: { project: TeamProject; onClick: () =
 
 // ─── Project List Row ─────────────────────────────────────────────────────────
 
-function ProjectListRow({ project, onClick }: { project: TeamProject; onClick: () => void }) {
+function ProjectListRow({ project, onClick }: { project: WorkspaceProject; onClick: () => void }) {
   return (
     <div
       onClick={onClick}
@@ -281,6 +284,7 @@ function ProjectListRow({ project, onClick }: { project: TeamProject; onClick: (
           <div className="h-full bg-neutral-900 rounded-full" style={{ width: `${project.progress}%` }} />
         </div>
         <PriorityBar priority={project.priority} />
+        
         <MessageSquare className="w-4 h-4 text-neutral-300" />
       </div>
     </div>
@@ -289,7 +293,7 @@ function ProjectListRow({ project, onClick }: { project: TeamProject; onClick: (
 
 // ─── Project Detail Panel ─────────────────────────────────────────────────────
 
-function TeamProjectDetail({ project, onBack }: { project: TeamProject; onBack: () => void }) {
+function WorkspaceProjectDetail({ project, onBack }: { project: WorkspaceProject; onBack: () => void }) {
   const [commentText, setCommentText] = useState('')
   const [comments, setComments] = useState<Comment[]>(project.comments ?? [])
   const [replyingTo, setReplyingTo] = useState<string | null>(null)
@@ -575,7 +579,7 @@ function TeamProjectDetail({ project, onBack }: { project: TeamProject; onBack: 
 
 // ─── Main Content ─────────────────────────────────────────────────────────────
 
-function TeamsMainContent({ onSelectProject }: { onSelectProject: (p: TeamProject) => void }) {
+function WorkspaceMainContent({ onSelectProject }: { onSelectProject: (p: WorkspaceProject) => void }) {
   const [displayMode, setDisplayMode] = useState<DisplayMode>('grid')
   const [search, setSearch] = useState('')
   const [sortOpen, setSortOpen] = useState(false)
@@ -589,7 +593,7 @@ function TeamsMainContent({ onSelectProject }: { onSelectProject: (p: TeamProjec
     return () => document.removeEventListener('click', handler)
   }, [])
 
-  const filtered = TEAM_PROJECTS.filter((p) =>
+  const filtered = WORKSPACE_PROJECTS.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   )
 
@@ -682,10 +686,10 @@ function TeamsMainContent({ onSelectProject }: { onSelectProject: (p: TeamProjec
 
 // ─── Page Shell ───────────────────────────────────────────────────────────────
 
-export function TeamsPage({ sidebarExpanded, onToggleSidebar }: TeamsPageProps) {
+export function WorkspacePage({ sidebarExpanded, onToggleSidebar }: WorkspacePageProps) {
   const navigate = useNavigate()
   const [profileOpen, setProfileOpen] = useState(false)
-  const [selectedProject, setSelectedProject] = useState<TeamProject | null>(null)
+  const [selectedProject, setSelectedProject] = useState<WorkspaceProject | null>(null)
   const profileRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -734,21 +738,45 @@ export function TeamsPage({ sidebarExpanded, onToggleSidebar }: TeamsPageProps) 
                 </div>
               </button>
 
-              {profileOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-xl border border-neutral-200 bg-white shadow-xl p-1.5 z-50">
-                  <div className="px-3 py-2 border-b border-neutral-100 mb-1">
-                    <p className="text-[12px] font-bold">User</p>
-                    <p className="text-[10px] text-neutral-400">Premium Account</p>
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-2.5 w-full px-3 py-2.5 text-[12px] font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    <LogOut className="w-3.5 h-3.5" />
-                    Log out
-                  </button>
-                </div>
-              )}
+          {profileOpen && (
+  <div className="absolute right-0 mt-2 w-48 rounded-xl border border-neutral-200 bg-white shadow-xl p-1.5 z-50">
+    <div className="px-3 py-2 border-b border-neutral-100 mb-1">
+      <p className="text-[12px] font-bold">User</p>
+      <p className="text-[10px] text-neutral-400">Premium Account</p>
+    </div>
+    
+    <button
+      onClick={() => { navigate('/profile'); setProfileOpen(false) }}
+      className="flex items-center gap-2.5 w-full px-3 py-2.5 text-[12px] font-medium text-neutral-700 hover:bg-neutral-50 rounded-lg transition-colors"
+    >
+      <CreditCard className="w-3.5 h-3.5" />
+      Profile
+    </button>
+    <button
+      onClick={() => { navigate('/billing'); setProfileOpen(false) }}
+      className="flex items-center gap-2.5 w-full px-3 py-2.5 text-[12px] font-medium text-neutral-700 hover:bg-neutral-50 rounded-lg transition-colors"
+    >
+      <CreditCard className="w-3.5 h-3.5" />
+      Billing
+    </button>
+    <button
+      onClick={() => { navigate('/settings'); setProfileOpen(false) }}
+      className="flex items-center gap-2.5 w-full px-3 py-2.5 text-[12px] font-medium text-neutral-700 hover:bg-neutral-50 rounded-lg transition-colors"
+    >
+      <Settings className="w-3.5 h-3.5" />
+      Settings
+    </button>
+    <div className="h-px bg-neutral-100 my-1" />
+    <button
+      onClick={handleLogout}
+      className="flex items-center gap-2.5 w-full px-3 py-2.5 text-[12px] font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+    >
+      <LogOut className="w-3.5 h-3.5" />
+      Log out
+    </button>
+  </div>
+)}
+   
             </div>
           </div>
         </header>
@@ -756,12 +784,12 @@ export function TeamsPage({ sidebarExpanded, onToggleSidebar }: TeamsPageProps) 
         {/* ── Main Content ── */}
         <main className="flex-1 p-8 max-w-[1600px] w-full mx-auto">
           {selectedProject ? (
-            <TeamProjectDetail
+            <WorkspaceProjectDetail
               project={selectedProject}
               onBack={() => setSelectedProject(null)}
             />
           ) : (
-            <TeamsMainContent onSelectProject={setSelectedProject} />
+            <WorkspaceMainContent onSelectProject={setSelectedProject} />
           )}
         </main>
 
