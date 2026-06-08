@@ -794,11 +794,11 @@ export function WorkspacePage({ sidebarExpanded, onToggleSidebar }: WorkspacePag
         </main>
 
         {/* ── FAB ── */}
-        {!selectedProject && (
+        {/* {!selectedProject && (
           <button className="fixed bottom-7 right-7 w-12 h-12 bg-neutral-900 hover:bg-neutral-700 text-white rounded-full flex items-center justify-center shadow-lg transition-colors z-40">
             <Plus className="w-5 h-5" />
           </button>
-        )}
+        )} */}
       </div>
     </div>
   )
