@@ -12,6 +12,7 @@ import { TimelinePage } from './pages/TimelinePage'
 import { WorkspacePage } from './pages/WorkspacePage'
 import { SettingsPage } from './pages/SettingsPage'
 import { BillingPage } from './pages/BillingPage'
+import { TeamsPage } from './pages/TeamsPage'
 
 function App() {
   const [sidebarExpanded, setSidebarExpanded] = useState(false)
@@ -35,7 +36,11 @@ function App() {
         element={<TimelinePage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 
-        path="/workspace/teams" 
+        path="/teams" 
+        element={<TeamsPage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
+      />
+      <Route 
+        path="/workspace" 
         element={<WorkspacePage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
       />
       <Route 
