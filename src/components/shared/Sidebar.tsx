@@ -1,18 +1,19 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Home, FileBox, TrendingUp, Workflow, ChevronLeft, CreditCard,MoreHorizontal, Settings, ChevronRight, Users } from 'lucide-react'
+import { Home, Boxes, TrendingUp, Workflow, ChevronLeft, CreditCard,ChartBarStacked,  ChevronRight, Users } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
 const navItems = [
   { icon: Home, label: 'Home', path: '/' },
-  { icon: FileBox, label: 'Library', path: '/library' },
+  { icon: ChartBarStacked, label: 'Library', path: '/library' },
   { icon: TrendingUp, label: 'Timeline', path: '/timeline' },
   {
-    icon: MoreHorizontal,
-    label: 'More',
+    icon: Boxes,
+    label: 'Workspace',
     path: '/workspace',
     children: [
+      { icon: Workflow, label: 'Projects', path: '/workspace' },
       { icon: Users, label: 'Teams', path: '/teams' },
-      { icon: Workflow, label: 'Workspace', path: '/workspace' },
+
     ],
   },
 ]

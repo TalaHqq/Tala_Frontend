@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  Search, Bell, LogOut, User,
+   Bell, LogOut, User,
   ArrowUp, X, Download, CreditCard, Settings,
 } from 'lucide-react'
 import { Sidebar } from '../components/shared/Sidebar'
@@ -185,9 +185,7 @@ export function BillingPage({ sidebarExpanded, onToggleSidebar }: BillingPagePro
           <span className="text-[16px] font-semibold text-neutral-800 tracking-tight">Billing</span>
 
           <div className="flex items-center gap-5">
-            <button className="p-1 text-neutral-500 hover:text-neutral-800 transition-colors">
-              <Search className="w-4 h-4" />
-            </button>
+         
             <button className="p-1 text-neutral-500 hover:text-neutral-800 transition-colors relative">
               <Bell className="w-4 h-4" />
               <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-neutral-900 rounded-full" />

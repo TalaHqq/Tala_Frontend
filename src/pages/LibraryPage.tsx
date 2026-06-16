@@ -492,9 +492,7 @@ export function LibraryPage({ sidebarExpanded, onToggleSidebar }: LibraryPagePro
           </div>
 
           <div className="flex items-center gap-5">
-            <button className="p-1 text-muted-foreground hover:text-foreground transition-colors">
-              <Search className="w-5 h-5" />
-            </button>
+       
             <button className="p-1 text-muted-foreground hover:text-foreground transition-colors relative">
               <Bell className="w-5 h-5" />
               <span className="absolute top-0 right-0 w-2 h-2 bg-foreground rounded-full border-2 border-background" />
@@ -1049,7 +1047,6 @@ export function LibraryPage({ sidebarExpanded, onToggleSidebar }: LibraryPagePro
                   <X className="w-5 h-5" />
                 </button>
               </div>
-
               <form onSubmit={handleCreateCollection} className="p-8 space-y-6 overflow-y-auto">
                 {createError && (
                   <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-[13px]">

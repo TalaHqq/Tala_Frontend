@@ -281,9 +281,9 @@ function TaskDetailModal({ task, onClose }: { task: TaskDetail; onClose: () => v
   const [comment, setComment] = useState('')
   const [status, setStatus] = useState(task.status)
   const overlayRef = useRef<HTMLDivElement>(null)
+setStatus(task.status)
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => { if (e.target === overlayRef.current) onClose() }
-
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', handler)
@@ -967,7 +967,6 @@ export function TimelinePage({ sidebarExpanded, onToggleSidebar }: TimelinePageP
         <header className="flex items-center justify-between h-14 px-8 border-b border-neutral-200/60 bg-[#F4F4F4]/80 backdrop-blur-md sticky top-0 z-30">
           <span className="text-[16px] font-semibold text-neutral-800 tracking-tight">Timeline</span>
           <div className="flex items-center gap-5">
-            <button className="p-1 text-neutral-500 hover:text-neutral-800 transition-colors"><Search className="w-4 h-4" /></button>
             <button className="p-1 text-neutral-500 hover:text-neutral-800 transition-colors relative">
               <Bell className="w-4 h-4" />
               <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-neutral-900 rounded-full" />

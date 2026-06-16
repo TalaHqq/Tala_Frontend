@@ -748,9 +748,8 @@ export function WorkspacePage({ sidebarExpanded, onToggleSidebar }: WorkspacePag
       <Sidebar isExpanded={sidebarExpanded} onToggle={onToggleSidebar} />
       <div className="flex flex-1 flex-col min-w-0 transition-all duration-300 ease-in-out" style={{ marginLeft: sidebarExpanded ? '14rem' : '52px' }}>
         <header className="flex items-center justify-between h-14 px-8 border-b border-neutral-200/60 bg-[#F4F4F4]/80 backdrop-blur-md sticky top-0 z-30">
-          <span className="text-[16px] font-semibold text-neutral-800 tracking-tight">Workspace</span>
+          <span className="text-[16px] font-semibold text-neutral-800 tracking-tight">Projects</span>
           <div className="flex items-center gap-5">
-            <button className="p-1 text-neutral-500 hover:text-neutral-800 transition-colors"><Search className="w-4 h-4" /></button>
             <button className="p-1 text-neutral-500 hover:text-neutral-800 transition-colors relative">
               <Bell className="w-4 h-4" />
               <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-neutral-900 rounded-full" />
