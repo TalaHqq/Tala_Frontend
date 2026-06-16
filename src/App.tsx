@@ -13,6 +13,7 @@ import { WorkspacePage } from './pages/WorkspacePage'
 import { SettingsPage } from './pages/SettingsPage'
 import { BillingPage } from './pages/BillingPage'
 import { TeamsPage } from './pages/TeamsPage'
+import {HomePage} from './pages/HomePage'
 
 function App() {
   const [sidebarExpanded, setSidebarExpanded] = useState(false)
@@ -27,6 +28,11 @@ function App() {
       <Route path="/register" element={<SignUpPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
+      
+      <Route 
+        path="/home" 
+        element={<HomePage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 
+      />
       <Route 
         path="/library" 
         element={<LibraryPage sidebarExpanded={sidebarExpanded} onToggleSidebar={handleToggleSidebar} />} 

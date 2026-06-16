@@ -3,7 +3,7 @@ import { Home, Boxes, TrendingUp, Workflow, ChevronLeft, CreditCard,ChartBarStac
 import { useState, useRef, useEffect } from 'react'
 
 const navItems = [
-  { icon: Home, label: 'Home', path: '/' },
+  { icon: Home, label: 'Home', path: '/home' },
   { icon: ChartBarStacked, label: 'Library', path: '/library' },
   { icon: TrendingUp, label: 'Timeline', path: '/timeline' },
   {
