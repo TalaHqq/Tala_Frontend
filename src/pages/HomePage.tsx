@@ -4,6 +4,7 @@ import {
   Bell, LogOut, User, CreditCard, Settings,
   Plus, Users, FolderPlus, Upload, UserPlus,
   TrendingUp, Palette, Laptop, BarChart2,Speaker,
+  CloudUpload, FileText as FileTextIcon, Share2, Heart,
 } from 'lucide-react'
 import { Sidebar } from '../components/shared/Sidebar'
 
@@ -50,6 +51,15 @@ interface ActivityItem {
   time: string
 }
 
+interface NotificationItem {
+  id: string
+  type: 'upload' | 'comment' | 'share' | 'favorite' | 'system'
+  title: string
+  description: string
+  time: string
+  read: boolean
+}
+
 // ─── Static data ──────────────────────────────────────────────────────────────
 
 const AVATAR_URLS = [
@@ -85,6 +95,14 @@ const ACTIVITY: ActivityItem[] = [
   { id: 'a3', actor: 'Kofi Boateng', avatar: AVATAR_URLS[3], action: 'commented on', target: '"Frontend onboarding flow"',         time: '6h ago' },
 ]
 
+const NOTIFICATIONS: NotificationItem[] = [
+  { id: 'n1', type: 'upload',   title: 'Upload complete',      description: '"Design_v3.png" finished uploading to Brand Redesign', time: '10 mins ago', read: false },
+  { id: 'n2', type: 'comment',  title: 'New comment',          description: 'Kofi Boateng commented on "Frontend onboarding flow"',  time: '1 hour ago',  read: false },
+  { id: 'n3', type: 'share',    title: 'Project shared',       description: 'Efua Asante shared "Growth Experiments" with you',      time: 'Yesterday',   read: false },
+  { id: 'n4', type: 'favorite', title: 'Added to favorites',   description: 'Kweku Mensah favorited "Brand Redesign Q2"',            time: '2 days ago',  read: true  },
+  { id: 'n5', type: 'system',   title: 'Weekly summary ready', description: 'Your team completed 12 tasks this week',               time: '3 days ago',  read: true  },
+]
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const STATE_STYLES: Record<WorkflowState, string> = {
@@ -107,17 +125,47 @@ function StateBadge({ state }: { state: WorkflowState }) {
   )
 }
 
+function notificationIcon(type: NotificationItem['type']) {
+  switch (type) {
+    case 'upload': return <CloudUpload className="w-3.5 h-3.5" />
+    case 'comment': return <FileTextIcon className="w-3.5 h-3.5" />
+    case 'share': return <Share2 className="w-3.5 h-3.5" />
+    case 'favorite': return <Heart className="w-3.5 h-3.5" />
+    default: return <Bell className="w-3.5 h-3.5" />
+  }
+}
+
 // ─── HomePage ─────────────────────────────────────────────────────────────────
 
 export function HomePage({ sidebarExpanded, onToggleSidebar }: HomePageProps) {
   const navigate = useNavigate()
   const [profileOpen, setProfileOpen] = useState(false)
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [notifications, setNotifications] = useState<NotificationItem[]>(NOTIFICATIONS)
   const profileRef = useRef<HTMLDivElement>(null)
+  const notificationsRef = useRef<HTMLDivElement>(null)
+
+  const unreadCount = notifications.filter(n => !n.read).length
+
+  const markAllNotificationsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+  }
+
+  const markNotificationRead = (id: string) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
+  }
+
+  const clearNotifications = () => {
+    setNotifications([])
+  }
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
         setProfileOpen(false)
+      }
+      if (notificationsRef.current && !notificationsRef.current.contains(e.target as Node)) {
+        setNotificationsOpen(false)
       }
     }
     document.addEventListener('click', handleClickOutside)
@@ -146,14 +194,85 @@ export function HomePage({ sidebarExpanded, onToggleSidebar }: HomePageProps) {
           <span className="text-[16px] font-semibold text-neutral-800 tracking-tight">Home</span>
 
           <div className="flex items-center gap-5">
-            <button className="p-1 text-neutral-500 hover:text-neutral-800 transition-colors relative">
-              <Bell className="w-4 h-4" />
-              <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-neutral-900 rounded-full" />
-            </button>
+            <div className="relative" ref={notificationsRef}>
+              <button
+                onClick={() => {
+                  setNotificationsOpen(!notificationsOpen)
+                  if (!notificationsOpen) setProfileOpen(false)
+                }}
+                className="p-1 text-neutral-500 hover:text-neutral-800 transition-colors relative"
+              >
+                <Bell className="w-4 h-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-neutral-900 rounded-full" />
+                )}
+              </button>
+
+              {notificationsOpen && (
+                <div className="absolute right-0 mt-2 w-[340px] rounded-xl border border-neutral-200 bg-white shadow-xl overflow-hidden z-50">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100">
+                    <p className="text-[12px] font-bold text-neutral-900">Notifications</p>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={markAllNotificationsRead}
+                        className="text-[10px] font-semibold text-neutral-400 hover:text-neutral-800 transition-colors"
+                      >
+                        Mark all as read
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="max-h-[340px] overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center gap-2 py-10">
+                        <Bell className="w-6 h-6 text-neutral-200" />
+                        <p className="text-[11px] font-medium text-neutral-400">You're all caught up</p>
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-neutral-100">
+                        {notifications.map((n) => (
+                          <button
+                            key={n.id}
+                            onClick={() => markNotificationRead(n.id)}
+                            className={`w-full flex items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-50 ${!n.read ? 'bg-neutral-50/70' : ''}`}
+                          >
+                            <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${!n.read ? 'bg-neutral-900 text-white' : 'bg-neutral-100 text-neutral-400'}`}>
+                              {notificationIcon(n.type)}
+                            </div>
+                            <div className="min-w-0 flex-1 space-y-0.5">
+                              <div className="flex items-center gap-2">
+                                <p className="text-[11.5px] font-bold text-neutral-900 truncate">{n.title}</p>
+                                {!n.read && <span className="w-1.5 h-1.5 rounded-full bg-neutral-900 flex-shrink-0" />}
+                              </div>
+                              <p className="text-[11px] text-neutral-500 leading-relaxed line-clamp-2">{n.description}</p>
+                              <p className="text-[10px] font-medium text-neutral-400 pt-0.5">{n.time}</p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {notifications.length > 0 && (
+                    <div className="px-4 py-2.5 border-t border-neutral-100">
+                      <button
+                        onClick={clearNotifications}
+                        className="w-full text-center text-[10px] font-semibold text-neutral-400 hover:text-red-600 transition-colors"
+                      >
+                        Clear all notifications
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             <div className="relative" ref={profileRef}>
               <button
-                onClick={() => setProfileOpen(!profileOpen)}
+                onClick={() => {
+                  setProfileOpen(!profileOpen)
+                  if (!profileOpen) setNotificationsOpen(false)
+                }}
                 className="flex items-center gap-2 p-0.5 rounded-full border border-neutral-300 hover:border-neutral-400 transition-all overflow-hidden"
               >
                 <div className="w-6 h-6 rounded-full bg-neutral-200 flex items-center justify-center">
@@ -203,7 +322,7 @@ export function HomePage({ sidebarExpanded, onToggleSidebar }: HomePageProps) {
 
           {/* Greeting */}
           <div>
-            <h1 className="text-[20px] font-bold text-neutral-900">Hey there, Ama </h1><Speaker/>
+            <h1 className="text-[20px] font-bold text-neutral-900">Welcome back! {"User"} </h1><Speaker/>
             <p className="text-[12px] text-neutral-400 mt-0.5">{today} · Here's what's on your plate today.</p>
           </div>
 
