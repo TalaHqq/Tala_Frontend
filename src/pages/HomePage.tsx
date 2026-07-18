@@ -525,7 +525,6 @@ export function HomePage({ sidebarExpanded, onToggleSidebar }: HomePageProps) {
               </div>
             </div>
           </div>
-
         </main>
       </div>
     </div>

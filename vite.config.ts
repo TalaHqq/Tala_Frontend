@@ -20,7 +20,7 @@ export default defineConfig({
       }
     }
   ],
-  base: '/Tala_Frontend/',
+  base: '/',
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
