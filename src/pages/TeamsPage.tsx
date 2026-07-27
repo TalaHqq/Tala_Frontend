@@ -546,94 +546,100 @@ function TeamsMainContent({ onSelectTeam }: { onSelectTeam: (t: Team) => void })
   return (
     <div className="flex flex-col gap-6">
       {/* Toolbar */}
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-[18px] font-bold text-neutral-900">Teams</h1>
-          <p className="text-[12px] text-neutral-400 mt-0.5">Organise members into focused groups to collaborate on projects.</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search teams..."
-              className="bg-white border border-neutral-200 rounded-lg pl-9 pr-4 py-2 text-[12px] w-56 focus:outline-none focus:border-neutral-400 transition-colors placeholder:text-neutral-400"
-            />
-          </div>
-          <button
-            onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 bg-neutral-900 hover:bg-neutral-700 text-white rounded-lg px-4 py-2 text-[12px] font-semibold transition-colors"
-          >
-            <Plus className="w-3.5 h-3.5" />New team
-          </button>
-        </div>
-      </div>
-
+  <div className="flex flex-wrap items-center justify-between gap-4">
+  <div>
+    <h1 className="text-[18px] font-bold text-neutral-900">Teams</h1>
+    <p className="text-[12px] text-neutral-400 mt-0.5">Organise members into focused groups to collaborate on projects.</p>
+  </div>
+  <div className="flex items-center gap-2 flex-wrap">
+    <div className="relative">
+      <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+      <input
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        placeholder="Search teams..."
+        className="bg-white border border-neutral-200 rounded-lg pl-9 pr-4 py-2 text-[12px] w-56 focus:outline-none focus:border-neutral-400 transition-colors placeholder:text-neutral-400"
+      />
+    </div>
+    <button
+      onClick={() => setShowCreate(true)}
+      className="flex items-center gap-2 bg-neutral-900 hover:bg-neutral-700 text-white rounded-lg px-4 py-2 text-[12px] font-semibold transition-colors whitespace-nowrap"
+    >
+      <Plus className="w-3.5 h-3.5" />New team
+    </button>
+  </div>
+</div>
       {/* Stats row */}
-      <div className="grid grid-cols-3 gap-4">
-        {[
-          { label: 'Total teams', value: teams.length },
-          { label: 'Total members', value: [...new Set(teams.flatMap(t => t.members.map(m => m.id)))].length },
-          { label: 'Total projects', value: teams.reduce((s, t) => s + t.projectCount, 0) },
-        ].map(stat => (
-          <div key={stat.label} className="bg-white border border-neutral-200 rounded-2xl px-5 py-4">
-            <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">{stat.label}</p>
-            <p className="text-[24px] font-bold text-neutral-900">{stat.value}</p>
-          </div>
-        ))}
-      </div>
+     <div className="grid grid-cols-3 gap-2">
+  {[
+    { label: 'Total teams', value: teams.length },
+    { label: 'Total members', value: [...new Set(teams.flatMap(t => t.members.map(m => m.id)))].length },
+    { label: 'Total projects', value: teams.reduce((s, t) => s + t.projectCount, 0) },
+  ].map(stat => (
+    <div
+      key={stat.label}
+      className="bg-white border border-neutral-200 rounded-2xl px-5 py-4 min-w-0"
+    >
+      <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1 truncate">
+        {stat.label}
+      </p>
+      <p className="text-[24px] font-bold text-neutral-900 truncate">
+        {stat.value}
+      </p>
+    </div>
+  ))}
+</div>
 
       {/* Team cards */}
       <div className="flex flex-col gap-3">
         {filtered.map(team => (
-          <div
-            key={team.id}
-            onClick={() => onSelectTeam(team)}
-            className="bg-white border border-neutral-200 rounded-2xl px-6 py-5 flex items-center gap-5 hover:shadow-md transition-shadow cursor-pointer group"
-          >
-            {/* Icon */}
-            <div className="w-11 h-11 rounded-xl bg-neutral-900 flex items-center justify-center flex-shrink-0">
-              <Users className="w-5 h-5 text-white" />
-            </div>
+    <div
+  key={team.id}
+  onClick={() => onSelectTeam(team)}
+  className="bg-white border border-neutral-200 rounded-2xl px-6 py-5 flex flex-wrap items-center gap-5 hover:shadow-md transition-shadow cursor-pointer group"
+>
+  {/* Icon + Info */}
+  <div className="flex items-center gap-4 flex-1 min-w-[220px]">
+    <div className="w-11 h-11 rounded-xl bg-neutral-900 flex items-center justify-center flex-shrink-0">
+      <Users className="w-5 h-5 text-white" />
+    </div>
+    <div className="min-w-0">
+      <div className="flex items-center gap-2 mb-0.5">
+        <span className="text-[14px] font-bold text-neutral-900">{team.name}</span>
+        <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold border text-neutral-500 bg-neutral-50 border-neutral-200 flex-shrink-0">
+          {team.visibility === 'secret' ? <Lock className="w-2.5 h-2.5" /> : <Globe className="w-2.5 h-2.5" />}
+          {team.visibility === 'secret' ? 'Secret' : 'Visible'}
+        </span>
+      </div>
+      {team.description && (
+        <p className="text-[12px] text-neutral-400 truncate max-w-lg">{team.description}</p>
+      )}
+    </div>
+  </div>
 
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-0.5">
-                <span className="text-[14px] font-bold text-neutral-900">{team.name}</span>
-                <span className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold border text-neutral-500 bg-neutral-50 border-neutral-200`}>
-                  {team.visibility === 'secret' ? <Lock className="w-2.5 h-2.5" /> : <Globe className="w-2.5 h-2.5" />}
-                  {team.visibility === 'secret' ? 'Secret' : 'Visible'}
-                </span>
-              </div>
-              {team.description && (
-                <p className="text-[12px] text-neutral-400 truncate max-w-lg">{team.description}</p>
-              )}
-            </div>
+  {/* Members stack */}
+  <div className="flex items-center gap-3 flex-shrink-0">
+    <div className="flex -space-x-2">
+      {team.members.slice(0, 4).map((m, i) => (
+        <img key={i} src={m.avatar} alt={m.name} className="w-7 h-7 rounded-full ring-2 ring-white object-cover" />
+      ))}
+      {team.members.length > 4 && (
+        <div className="w-7 h-7 rounded-full ring-2 ring-white bg-neutral-200 flex items-center justify-center text-[10px] font-bold text-neutral-600">
+          +{team.members.length - 4}
+        </div>
+      )}
+    </div>
+    <span className="text-[12px] text-neutral-400 whitespace-nowrap">{team.members.length} member{team.members.length !== 1 ? 's' : ''}</span>
+  </div>
 
-            {/* Members stack */}
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <div className="flex -space-x-2">
-                {team.members.slice(0, 4).map((m, i) => (
-                  <img key={i} src={m.avatar} alt={m.name} className="w-7 h-7 rounded-full ring-2 ring-white object-cover" />
-                ))}
-                {team.members.length > 4 && (
-                  <div className="w-7 h-7 rounded-full ring-2 ring-white bg-neutral-200 flex items-center justify-center text-[10px] font-bold text-neutral-600">
-                    +{team.members.length - 4}
-                  </div>
-                )}
-              </div>
-              <span className="text-[12px] text-neutral-400">{team.members.length} member{team.members.length !== 1 ? 's' : ''}</span>
-            </div>
+  {/* Projects count */}
+  <div className="text-right flex-shrink-0 w-20">
+    <p className="text-[13px] font-bold text-neutral-900">{team.projectCount}</p>
+    <p className="text-[11px] text-neutral-400">project{team.projectCount !== 1 ? 's' : ''}</p>
+  </div>
 
-            {/* Projects count */}
-            <div className="text-right flex-shrink-0 w-20">
-              <p className="text-[13px] font-bold text-neutral-900">{team.projectCount}</p>
-              <p className="text-[11px] text-neutral-400">project{team.projectCount !== 1 ? 's' : ''}</p>
-            </div>
-
-            <ChevronDown className="w-4 h-4 text-neutral-300 group-hover:text-neutral-500 transition-colors -rotate-90 flex-shrink-0" />
-          </div>
+  <ChevronDown className="w-4 h-4 text-neutral-300 group-hover:text-neutral-500 transition-colors -rotate-90 flex-shrink-0" />
+</div>
         ))}
 
         {filtered.length === 0 && (

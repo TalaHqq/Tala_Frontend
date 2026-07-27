@@ -654,49 +654,58 @@ function WorkspaceMainContent({ onSelectProject }: { onSelectProject: (p: Worksp
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between gap-4">
-        <div className="relative">
-          <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search tasks, projects..." className="bg-white border border-neutral-200 rounded-lg pl-9 pr-4 py-2 text-[12px] w-72 focus:outline-none focus:border-neutral-400 transition-colors placeholder:text-neutral-400 shadow-2xs" />
+ <div
+  className="flex items-center gap-4 overflow-x-auto pb-1"
+  style={{ overflowX: 'scroll' }}
+>
+  <div className="relative flex-shrink-0">
+    <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+    <input
+      type="text"
+      value={search}
+      onChange={e => setSearch(e.target.value)}
+      placeholder="Search tasks, projects..."
+      className="bg-white border border-neutral-200 rounded-lg pl-9 pr-4 py-2 text-[12px] w-72 focus:outline-none focus:border-neutral-400 transition-colors placeholder:text-neutral-400 shadow-2xs"
+    />
+  </div>
+  <div className="flex items-center gap-2 flex-shrink-0">
+    <button className="flex items-center gap-2 bg-white border border-neutral-200 rounded-lg px-3 py-2 text-[12px] font-medium text-neutral-600 hover:bg-neutral-50 shadow-2xs transition-colors whitespace-nowrap">
+      <Filter className="w-3.5 h-3.5" />Filter
+    </button>
+    <div className="relative flex-shrink-0" ref={sortRef}>
+      <button onClick={() => setSortOpen(!sortOpen)} className="flex items-center gap-2 bg-white border border-neutral-200 rounded-lg px-3 py-2 text-[12px] font-medium text-neutral-600 hover:bg-neutral-50 shadow-2xs transition-colors whitespace-nowrap">
+        Sort<ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
+      </button>
+      {sortOpen && (
+        <div className="absolute right-0 mt-1.5 w-40 bg-white border border-neutral-200 rounded-xl shadow-xl p-1.5 z-20">
+          {['Name', 'Due Date', 'Status', 'Progress'].map(opt => (
+            <button key={opt} className="w-full text-left px-3 py-2 text-[12px] font-medium text-neutral-600 hover:bg-neutral-50 rounded-lg transition-colors">{opt}</button>
+          ))}
         </div>
-        <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 bg-white border border-neutral-200 rounded-lg px-3 py-2 text-[12px] font-medium text-neutral-600 hover:bg-neutral-50 shadow-2xs transition-colors">
-            <Filter className="w-3.5 h-3.5" />Filter
-          </button>
-          <div className="relative" ref={sortRef}>
-            <button onClick={() => setSortOpen(!sortOpen)} className="flex items-center gap-2 bg-white border border-neutral-200 rounded-lg px-3 py-2 text-[12px] font-medium text-neutral-600 hover:bg-neutral-50 shadow-2xs transition-colors">
-              Sort<ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
-            </button>
-            {sortOpen && (
-              <div className="absolute right-0 mt-1.5 w-40 bg-white border border-neutral-200 rounded-xl shadow-xl p-1.5 z-20">
-                {['Name', 'Due Date', 'Status', 'Progress'].map(opt => (
-                  <button key={opt} className="w-full text-left px-3 py-2 text-[12px] font-medium text-neutral-600 hover:bg-neutral-50 rounded-lg transition-colors">{opt}</button>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className="flex items-center bg-white border border-neutral-200 rounded-lg overflow-hidden shadow-2xs">
-            <button
-              onClick={() => setDisplayMode('list')}
-              className={`flex items-center gap-1.5 px-3 py-2 text-[12px] font-medium transition-colors ${displayMode === 'list' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-50'}`}
-            >
-              <List className="w-3.5 h-3.5" />List
-            </button>
-            <button
-              onClick={() => setDisplayMode('grid')}
-              className={`flex items-center gap-1.5 px-3 py-2 text-[12px] font-medium transition-colors border-l border-neutral-200 ${displayMode === 'grid' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-50'}`}
-            >
-              <LayoutGrid className="w-3.5 h-3.5" />Grid
-            </button>
-            <button
-              onClick={() => setDisplayMode('sticky')}
-              className={`flex items-center gap-1.5 px-3 py-2 text-[12px] font-medium transition-colors border-l border-neutral-200 ${displayMode === 'sticky' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-50'}`}
-            >
-              <LucideNotepadText className="w-3.5 h-3.5" />Board
-            </button>
-          </div>
-        </div>
-      </div>
+      )}
+    </div>
+    <div className="flex items-center bg-white border border-neutral-200 rounded-lg overflow-hidden shadow-2xs flex-shrink-0">
+      <button
+        onClick={() => setDisplayMode('list')}
+        className={`flex items-center gap-1.5 px-3 py-2 text-[12px] font-medium transition-colors whitespace-nowrap ${displayMode === 'list' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-50'}`}
+      >
+        <List className="w-3.5 h-3.5" />List
+      </button>
+      <button
+        onClick={() => setDisplayMode('grid')}
+        className={`flex items-center gap-1.5 px-3 py-2 text-[12px] font-medium transition-colors border-l border-neutral-200 whitespace-nowrap ${displayMode === 'grid' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-50'}`}
+      >
+        <LayoutGrid className="w-3.5 h-3.5" />Grid
+      </button>
+      <button
+        onClick={() => setDisplayMode('sticky')}
+        className={`flex items-center gap-1.5 px-3 py-2 text-[12px] font-medium transition-colors border-l border-neutral-200 whitespace-nowrap ${displayMode === 'sticky' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-50'}`}
+      >
+        <LucideNotepadText className="w-3.5 h-3.5" />Board
+      </button>
+    </div>
+  </div>
+</div>
 
       {displayMode === 'grid' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

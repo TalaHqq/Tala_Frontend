@@ -1114,33 +1114,32 @@ export function TimelinePage({ sidebarExpanded, onToggleSidebar }: TimelinePageP
         </header>
 
         <main className="flex-1 p-8 space-y-6 max-w-[1600px] w-full mx-auto">
-          <div className="flex items-center justify-between">
-{viewMode !== 'effective'?(
-  <div className="bg-[#EAEAEA] p-0.5 rounded-lg flex items-center gap-0.5">
-    {(['Week', 'Month', 'Quarter'] as TimeFilter[]).map(f => (
-      <button key={f} onClick={() => setTimeFilter(f)} className={`px-3 py-1 text-[12px] font-medium rounded-md transition-all ${timeFilter === f ? 'bg-white shadow-sm text-neutral-900' : 'text-neutral-500 hover:text-neutral-800'}`}>{f}</button>
-    ))}
+     <div className="flex items-center justify-between gap-3 overflow-x pb-1" style={{overflowX:"scroll"}}>
+  {viewMode !== 'effective' ? (
+    <div className="bg-[#EAEAEA] p-0.5 rounded-lg flex items-center gap-0.5 flex-shrink-0">
+      {(['Week', 'Month', 'Quarter'] as TimeFilter[]).map(f => (
+        <button key={f} onClick={() => setTimeFilter(f)} className={`px-3 py-1 text-[12px] font-medium rounded-md transition-all whitespace-nowrap ${timeFilter === f ? 'bg-white shadow-sm text-neutral-900' : 'text-neutral-500 hover:text-neutral-800'}`}>{f}</button>
+      ))}
+    </div>
+  ) : (
+    <div className="flex-shrink-0" />
+  )}
+
+  <div className="flex items-center gap-2.5 flex-shrink-0">
+    <button className="bg-white border border-neutral-200 text-neutral-700 px-3 py-1.5 rounded-lg text-[12px] font-medium flex items-center gap-2 shadow-2xs hover:bg-neutral-50 whitespace-nowrap flex-shrink-0">
+      Filter by Status <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
+    </button>
+    <div className="bg-[#EAEAEA] p-0.5 rounded-lg flex items-center gap-0.5 flex-shrink-0">
+      {([{ key: 'calendar', label: 'Calendar' }, { key: 'gantt', label: 'Gantt' }, { key: 'effective', label: 'Overview' }] as { key: ViewMode; label: string }[]).map(({ key, label }) => (
+        <button key={key} onClick={() => setViewMode(key)} className={`px-3 py-1 text-[12px] font-medium rounded-md transition-all whitespace-nowrap ${viewMode === key ? 'bg-white shadow-sm text-neutral-900' : 'text-neutral-500 hover:text-neutral-800'}`}>{label}</button>
+      ))}
+    </div>
+    <div className="relative flex-shrink-0 w-56">
+      <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-2.5" />
+      <input type="text" placeholder="Search apps on projects" className="bg-white border border-neutral-200 rounded-lg pl-8 pr-3 py-1.5 text-[12px] w-56 focus:outline-none focus:border-neutral-400 transition-colors shadow-2xs placeholder:text-neutral-400" />
+    </div>
   </div>
-)
-:<>
-<div></div>
-</>
-}
-            <div className="flex items-center gap-2.5">
-              <button className="bg-white border border-neutral-200 text-neutral-700 px-3 py-1.5 rounded-lg text-[12px] font-medium flex items-center gap-2 shadow-2xs hover:bg-neutral-50">
-                Filter by Status <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
-              </button>
-              <div className="bg-[#EAEAEA] p-0.5 rounded-lg flex items-center gap-0.5">
-                {([{ key: 'calendar', label: 'Calendar' }, { key: 'gantt', label: 'Gantt' }, { key: 'effective', label: 'Overview' }] as { key: ViewMode; label: string }[]).map(({ key, label }) => (
-                  <button key={key} onClick={() => setViewMode(key)} className={`px-3 py-1 text-[12px] font-medium rounded-md transition-all ${viewMode === key ? 'bg-white shadow-sm text-neutral-900' : 'text-neutral-500 hover:text-neutral-800'}`}>{label}</button>
-                ))}
-              </div>
-              <div className="relative">
-                <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-2.5" />
-                <input type="text" placeholder="Search apps on projects" className="bg-white border border-neutral-200 rounded-lg pl-8 pr-3 py-1.5 text-[12px] w-56 focus:outline-none focus:border-neutral-400 transition-colors shadow-2xs placeholder:text-neutral-400" />
-              </div>
-            </div>
-          </div>
+</div>
 
           {viewMode === 'effective' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
