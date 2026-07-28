@@ -973,26 +973,26 @@ export function LibraryPage({ sidebarExpanded, onToggleSidebar }: LibraryPagePro
                   />
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40 pointer-events-none" />
-                    <input
-                      type="text"
-                      placeholder="Search collections..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="h-10 w-[240px] rounded-lg border border-foreground/10 bg-[#F4F4F4] pl-10 pr-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-foreground/10 transition-all"
-                    />
-                  </div>
-                  <button
-                    onClick={() => setIsCreateModalOpen(true)}
-                    className="inline-flex items-center gap-2 h-10 px-5 rounded-lg bg-foreground text-background text-[13px] font-bold hover:opacity-90 transition-opacity"
-                  >
-                    <Plus className="w-4.5 h-4.5" />
-                    New Collection
-                  </button>
-                </div>
-              </div>
+   <div className="flex items-center gap-3 flex-wrap w-full sm:w-auto">
+  <div className="relative flex-1 min-w-[160px] sm:flex-none">
+    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40 pointer-events-none" />
+    <input
+      type="text"
+      placeholder="Search collections..."
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      className="h-10 w-full sm:w-[240px] rounded-lg border border-foreground/10 bg-[#F4F4F4] pl-10 pr-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-foreground/10 transition-all"
+    />
+  </div>
+  <button
+    onClick={() => setIsCreateModalOpen(true)}
+    className="inline-flex items-center gap-2 h-10 px-5 rounded-lg bg-foreground text-background text-[13px] font-bold hover:opacity-90 transition-opacity whitespace-nowrap flex-shrink-0"
+  >
+    <Plus className="w-4.5 h-4.5" />
+    New Collection
+  </button>
+</div>
+</div>
 
               {isLoadingCollections ? (
                 <div className="flex flex-col items-center justify-center py-40 gap-4">
