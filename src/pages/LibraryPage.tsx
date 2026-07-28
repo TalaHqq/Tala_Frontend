@@ -526,10 +526,11 @@ export function LibraryPage({ sidebarExpanded, onToggleSidebar }: LibraryPagePro
     onToggle={onToggleSidebar} 
       />
 
-      <div
-        className="flex flex-1 flex-col min-w-0 transition-all duration-300 ease-in-out"
-        style={{ marginLeft: sidebarExpanded ? '14rem' : '52px' }}
-      >
+   <div
+  className={`flex flex-1 flex-col min-w-0 transition-all duration-300 ease-in-out ml-[52px] ${
+    sidebarExpanded ? 'lg:ml-56' : ''
+  }`}
+>
         <header className="flex items-center justify-between h-14 px-10 border-b border-border/10 bg-[#F4F4F4]/80 backdrop-blur-md sticky top-0 z-30">
           <div className="flex items-center gap-8">
             <span className="text-[18px] font-bold text-foreground/90 tracking-tight">

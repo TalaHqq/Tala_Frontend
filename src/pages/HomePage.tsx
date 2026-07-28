@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   Bell, LogOut, User, CreditCard, Settings,
   Plus, Users, FolderPlus, Upload, UserPlus,
-  TrendingUp, Palette, Laptop, BarChart2,Speaker,
+  TrendingUp, Palette, Laptop, BarChart2, Speaker,
   CloudUpload, FileText as FileTextIcon, Share2, Heart,
 } from 'lucide-react'
 import { Sidebar } from '../components/shared/Sidebar'
@@ -119,7 +119,7 @@ const STATE_DOT: Record<WorkflowState, string> = {
 
 function StateBadge({ state }: { state: WorkflowState }) {
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold ${STATE_STYLES[state]}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold whitespace-nowrap ${STATE_STYLES[state]}`}>
       {state}
     </span>
   )
@@ -186,14 +186,15 @@ export function HomePage({ sidebarExpanded, onToggleSidebar }: HomePageProps) {
       <Sidebar isExpanded={sidebarExpanded} onToggle={onToggleSidebar} />
 
       <div
-        className="flex flex-1 flex-col min-w-0 transition-all duration-300 ease-in-out"
-        style={{ marginLeft: sidebarExpanded ? '14rem' : '52px' }}
+        className={`flex flex-1 flex-col min-w-0 transition-all duration-300 ease-in-out ml-[52px] ${
+          sidebarExpanded ? 'lg:ml-56' : ''
+        }`}
       >
         {/* ── Header ── */}
-        <header className="flex items-center justify-between h-14 px-8 border-b border-neutral-200/60 bg-[#F4F4F4]/80 backdrop-blur-md sticky top-0 z-30">
-          <span className="text-[16px] font-semibold text-neutral-800 tracking-tight">Home</span>
+        <header className="flex items-center justify-between h-14 px-4 sm:px-6 md:px-8 border-b border-neutral-200/60 bg-[#F4F4F4]/80 backdrop-blur-md sticky top-0 z-30">
+          <span className="text-[15px] sm:text-[16px] font-semibold text-neutral-800 tracking-tight">Home</span>
 
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-3 sm:gap-5">
             <div className="relative" ref={notificationsRef}>
               <button
                 onClick={() => {
@@ -209,7 +210,7 @@ export function HomePage({ sidebarExpanded, onToggleSidebar }: HomePageProps) {
               </button>
 
               {notificationsOpen && (
-                <div className="absolute right-0 mt-2 w-[340px] rounded-xl border border-neutral-200 bg-white shadow-xl overflow-hidden z-50">
+                <div className="fixed sm:absolute left-4 right-4 sm:left-auto sm:right-0 top-16 sm:top-auto mt-0 sm:mt-2 w-auto sm:w-[340px] max-w-[calc(100vw-2rem)] rounded-xl border border-neutral-200 bg-white shadow-xl overflow-hidden z-50">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100">
                     <p className="text-[12px] font-bold text-neutral-900">Notifications</p>
                     {unreadCount > 0 && (
@@ -318,55 +319,58 @@ export function HomePage({ sidebarExpanded, onToggleSidebar }: HomePageProps) {
         </header>
 
         {/* ── Main ── */}
-        <main className="flex-1 p-8 max-w-[1200px] w-full mx-auto flex flex-col gap-6">
+        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-[1200px] w-full mx-auto flex flex-col gap-5 md:gap-6">
 
           {/* Greeting */}
-          <div>
-            <h1 className="text-[20px] font-bold text-neutral-900">Welcome back! {"User"} </h1><Speaker/>
-            <p className="text-[12px] text-neutral-400 mt-0.5">{today} · Here's what's on your plate today.</p>
+          <div className="flex items-center gap-2">
+            <div>
+              <h1 className="text-[18px] sm:text-[20px] font-bold text-neutral-900">Welcome back! User</h1>
+              <p className="text-[11px] sm:text-[12px] text-neutral-400 mt-0.5">{today} · Here's what's on your plate today.</p>
+            </div>
+            <Speaker className="w-4 h-4 text-neutral-400 flex-shrink-0" />
           </div>
 
           {/* ── Stats row ── */}
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {/* Active projects */}
-            <div className="bg-white border border-neutral-200 rounded-2xl px-5 py-4">
-              <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">Active projects</p>
-              <p className="text-[24px] font-bold text-neutral-900">8</p>
+            <div className="bg-white border border-neutral-200 rounded-2xl px-4 sm:px-5 py-4">
+              <p className="text-[10px] sm:text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">Active projects</p>
+              <p className="text-[20px] sm:text-[24px] font-bold text-neutral-900">8</p>
               <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 mt-1">
                 <TrendingUp className="w-2.5 h-2.5" />2 this week
               </span>
             </div>
 
             {/* Tasks due today */}
-            <div className="bg-white border border-neutral-200 rounded-2xl px-5 py-4">
-              <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">Tasks due today</p>
-              <p className="text-[24px] font-bold text-neutral-900">4</p>
+            <div className="bg-white border border-neutral-200 rounded-2xl px-4 sm:px-5 py-4">
+              <p className="text-[10px] sm:text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">Tasks due today</p>
+              <p className="text-[20px] sm:text-[24px] font-bold text-neutral-900">4</p>
               <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200 mt-1">
                 1 overdue
               </span>
             </div>
 
             {/* Efficiency score */}
-            <div className="bg-white border border-neutral-200 rounded-2xl px-5 py-4">
-              <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">Efficiency score</p>
-              <p className="text-[24px] font-bold text-neutral-900">87%</p>
+            <div className="bg-white border border-neutral-200 rounded-2xl px-4 sm:px-5 py-4">
+              <p className="text-[10px] sm:text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">Efficiency score</p>
+              <p className="text-[20px] sm:text-[24px] font-bold text-neutral-900">87%</p>
               <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md bg-green-50 text-green-700 border border-green-200 mt-1">
                 +3 pts this month
               </span>
             </div>
 
             {/* Collaborators */}
-            <div className="bg-white border border-neutral-200 rounded-2xl px-5 py-4">
-              <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">Collaborators</p>
-              <p className="text-[24px] font-bold text-neutral-900">12</p>
+            <div className="bg-white border border-neutral-200 rounded-2xl px-4 sm:px-5 py-4">
+              <p className="text-[10px] sm:text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">Collaborators</p>
+              <p className="text-[20px] sm:text-[24px] font-bold text-neutral-900">12</p>
               <p className="text-[11px] text-neutral-400 mt-1">across 3 teams</p>
             </div>
           </div>
 
           {/* ── Tasks + Projects ── */}
-          <div className="grid grid-cols-[1fr_340px] gap-4">
+          <div className="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-4">
             {/* Tasks due today */}
-            <div className="bg-white border border-neutral-200 rounded-2xl px-6 py-5">
+            <div className="bg-white border border-neutral-200 rounded-2xl px-4 sm:px-6 py-5">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-[13px] font-bold text-neutral-900">Tasks due today</h2>
                 <button
@@ -381,19 +385,19 @@ export function HomePage({ sidebarExpanded, onToggleSidebar }: HomePageProps) {
                 {TASKS.map((task, i) => (
                   <div
                     key={task.id}
-                    className={`flex items-center gap-3 py-2.5 ${i < TASKS.length - 1 ? 'border-b border-neutral-100' : ''}`}
+                    className={`flex items-center gap-2 sm:gap-3 py-2.5 ${i < TASKS.length - 1 ? 'border-b border-neutral-100' : ''}`}
                   >
                     <div className={`w-2 h-2 rounded-full flex-shrink-0 ${STATE_DOT[task.state]}`} />
                     <span className="text-[12px] font-semibold text-neutral-800 flex-1 min-w-0 truncate">{task.name}</span>
                     <StateBadge state={task.state} />
-                    <span className="text-[10px] text-neutral-400 flex-shrink-0 w-12 text-right">{task.due}</span>
+                    <span className="hidden sm:inline text-[10px] text-neutral-400 flex-shrink-0 w-12 text-right">{task.due}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Active projects */}
-            <div className="bg-white border border-neutral-200 rounded-2xl px-6 py-5">
+            <div className="bg-white border border-neutral-200 rounded-2xl px-4 sm:px-6 py-5">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-[13px] font-bold text-neutral-900">Projects</h2>
                 <button
@@ -417,7 +421,7 @@ export function HomePage({ sidebarExpanded, onToggleSidebar }: HomePageProps) {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[12px] font-semibold text-neutral-900 truncate group-hover:text-neutral-600 transition-colors">{proj.name}</p>
-                        <p className="text-[10px] text-neutral-400">{proj.team} · {proj.taskCount} tasks</p>
+                        <p className="text-[10px] text-neutral-400 truncate">{proj.team} · {proj.taskCount} tasks</p>
                       </div>
                       <div className="w-14 flex-shrink-0">
                         <p className="text-[11px] font-bold text-neutral-900 text-right mb-1">{proj.progress}%</p>
@@ -436,9 +440,9 @@ export function HomePage({ sidebarExpanded, onToggleSidebar }: HomePageProps) {
           </div>
 
           {/* ── Teams + Activity + Quick actions ── */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Teams */}
-            <div className="bg-white border border-neutral-200 rounded-2xl px-6 py-5">
+            <div className="bg-white border border-neutral-200 rounded-2xl px-4 sm:px-6 py-5">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-[13px] font-bold text-neutral-900">Your teams</h2>
                 <button
@@ -459,11 +463,11 @@ export function HomePage({ sidebarExpanded, onToggleSidebar }: HomePageProps) {
                       <Users className="w-4 h-4 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[12px] font-semibold text-neutral-900">{team.name}</p>
-                      <p className="text-[10px] text-neutral-400">{team.memberCount} members · {team.projectCount} projects</p>
+                      <p className="text-[12px] font-semibold text-neutral-900 truncate">{team.name}</p>
+                      <p className="text-[10px] text-neutral-400 truncate">{team.memberCount} members · {team.projectCount} projects</p>
                     </div>
                     <span
-                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border ${
+                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border flex-shrink-0 whitespace-nowrap ${
                         team.visibility === 'secret'
                           ? 'bg-amber-50 text-amber-700 border-amber-200'
                           : 'bg-neutral-100 text-neutral-600 border-neutral-200'
@@ -479,7 +483,7 @@ export function HomePage({ sidebarExpanded, onToggleSidebar }: HomePageProps) {
             {/* Right column */}
             <div className="flex flex-col gap-4">
               {/* Recent activity */}
-              <div className="bg-white border border-neutral-200 rounded-2xl px-6 py-5">
+              <div className="bg-white border border-neutral-200 rounded-2xl px-4 sm:px-6 py-5">
                 <h2 className="text-[13px] font-bold text-neutral-900 mb-4">Recent activity</h2>
                 <div className="flex flex-col">
                   {ACTIVITY.map((item, i) => (
@@ -492,19 +496,19 @@ export function HomePage({ sidebarExpanded, onToggleSidebar }: HomePageProps) {
                         alt={item.actor}
                         className="w-6 h-6 rounded-full object-cover flex-shrink-0 mt-0.5"
                       />
-                      <p className="text-[11px] text-neutral-500 flex-1 leading-relaxed">
+                      <p className="text-[11px] text-neutral-500 flex-1 leading-relaxed min-w-0">
                         <span className="font-semibold text-neutral-800">{item.actor}</span>
                         {' '}{item.action}{' '}
                         <span className="text-neutral-600">{item.target}</span>
                       </p>
-                      <span className="text-[10px] text-neutral-400 flex-shrink-0 mt-0.5">{item.time}</span>
+                      <span className="hidden sm:inline text-[10px] text-neutral-400 flex-shrink-0 mt-0.5">{item.time}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Quick actions */}
-              <div className="bg-white border border-neutral-200 rounded-2xl px-6 py-5">
+              <div className="bg-white border border-neutral-200 rounded-2xl px-4 sm:px-6 py-5">
                 <h2 className="text-[13px] font-bold text-neutral-900 mb-3">Quick actions</h2>
                 <div className="grid grid-cols-2 gap-2">
                   {[
@@ -518,7 +522,7 @@ export function HomePage({ sidebarExpanded, onToggleSidebar }: HomePageProps) {
                       onClick={action}
                       className="flex items-center gap-2 px-3 py-2.5 border border-dashed border-neutral-300 rounded-xl text-[11px] font-semibold text-neutral-500 hover:text-neutral-900 hover:border-neutral-500 transition-colors"
                     >
-                      <Icon className="w-3.5 h-3.5" />{label}
+                      <Icon className="w-3.5 h-3.5 flex-shrink-0" /><span className="truncate">{label}</span>
                     </button>
                   ))}
                 </div>
