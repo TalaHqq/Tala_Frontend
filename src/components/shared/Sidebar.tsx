@@ -207,7 +207,7 @@ export function Sidebar({ isExpanded, onToggle }: SidebarProps) {
           <Link to="/" className="flex items-center gap-2">
             <span className="text-base font-bold font-mono text-foreground tracking-tight select-none">
               {!isExpanded && <img className="m-auto" style={{width:"calc(100% - 10px)"}} src={icon} alt="logo"/>}
-              {isExpanded &&  style={{width:"calc(100% - 10px)"}} src={logo} alt="logo"/>}
+              {isExpanded && <img style={{width:"calc(100% - 10px)"}} src={logo} alt="logo"/>}
             </span>
           </Link>
           {isExpanded && (
