@@ -1,7 +1,8 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Home, Boxes, TrendingUp, Workflow, ChevronLeft, CreditCard,ChartBarStacked,  ChevronRight, Users } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
-
+import logo from '@/assets/logo.png'
+import icon from '@/assets/icon.png'
 const navItems = [
   { icon: Home, label: 'Home', path: '/home' },
   { icon: ChartBarStacked, label: 'Library', path: '/library' },
@@ -205,8 +206,8 @@ export function Sidebar({ isExpanded, onToggle }: SidebarProps) {
         <div className="flex items-center h-14 justify-center shrink-0">
           <Link to="/" className="flex items-center gap-2">
             <span className="text-base font-bold font-mono text-foreground tracking-tight select-none">
-              {!isExpanded && <img className="m-auto" style={{width:"calc(100% - 10px)"}} src="src/assets/icon.png" alt="logo"/>}
-              {isExpanded && <img className="m-auto" style={{width:"calc(100% - 10px)"}} src="src/assets/logo.png" alt="logo"/>}
+              {!isExpanded && <img className="m-auto" style={{width:"calc(100% - 10px)"}} src={icon} alt="logo"/>}
+              {isExpanded && <img className="m-auto" style={{width:"calc(100% - 10px)"}} src={logo} alt="logo"/>}
             </span>
           </Link>
           {isExpanded && (
